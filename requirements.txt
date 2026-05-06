@@ -1,0 +1,17 @@
+langgraph>=0.0.26
+langchain>=0.1.0
+langchain-openai>=0.0.2
+langchain-anthropic>=0.1.0
+tiffslide>=2.3.0
+tiatoolbox>=1.4.0
+lifelines>=0.28.0
+streamlit>=1.30.0
+scanpy>=1.9.0
+requests>=2.31.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+numpy>=1.24.0
+scikit-image>=0.21.0
+pydantic>=2.0.0
+jupyter>=1.0.0
