@@ -48,7 +48,7 @@ def execute_codeact(code: str, df_context: pd.DataFrame = None) -> str:
 
 if __name__ == "__main__":
     # Test the execution
-    mock_code = \"\"\"
+    mock_code = """
 print("Checking dataframe columns:")
 print(df.columns)
 kmf = KaplanMeierFitter()
@@ -57,7 +57,7 @@ df['time'] = [10, 20, 30, 40]
 df['event'] = [1, 0, 1, 1]
 kmf.fit(df['time'], event_observed=df['event'])
 print("Median survival:", kmf.median_survival_time_)
-\"\"\"
+"""
     
     mock_df = pd.DataFrame({"id": [1, 2, 3, 4]})
     result = execute_codeact(mock_code, df_context=mock_df)
