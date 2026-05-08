@@ -12,7 +12,7 @@ This MVP implements a "Perception-Action" loop where an AI agent (The Brain) aut
 
 ## Demo
 
-![Streamlit App Demo](assets/app_demo.webp)
+![Streamlit App Demo](assets/app_demo.png)
 
 ## Architecture
 
