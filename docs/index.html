@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DERMA-Agent | AI-Powered Cancer Pathology Discovery</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="logo">🔬</span>
+                <span class="brand-text">DERMA-Agent</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#overview" class="nav-link">Overview</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#science" class="nav-link">For Scientists</a></li>
+                <li><a href="#tutorial" class="nav-link">Tutorial</a></li>
+                <li><a href="#results" class="nav-link">Results</a></li>
+                <li><a href="#github" class="nav-link">GitHub</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-background"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">🚀 v2.0 Released</div>
+                <h1 class="hero-title">
+                    AI-Powered Cancer<br>
+                    <span class="gradient-text">Pathology Discovery</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Accelerate cancer research with autonomous AI-driven hypothesis generation, 
+                    knowledge-guided discovery, and advanced pathology analysis
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">20+</span>
+                        <span class="stat-label">Cancer Types</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Knowledge Nodes</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">10x</span>
+                        <span class="stat-label">Faster Discovery</span>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    <a href="#tutorial" class="btn btn-primary">Get Started</a>
+                    <a href="https://github.com/sgmoorthy/DERMA-Agent" class="btn btn-secondary" target="_blank">
+                        <span class="icon">⭐</span> Star on GitHub
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="discovery-animation">
+                    <div class="node central">🧠<br>AI Agent</div>
+                    <div class="node n1">📊<br>TCGA Data</div>
+                    <div class="node n2">🔬<br>Pathology</div>
+                    <div class="node n3">🧬<br>Knowledge</div>
+                    <div class="node n4">📈<br>Survival</div>
+                    <div class="connection c1"></div>
+                    <div class="connection c2"></div>
+                    <div class="connection c3"></div>
+                    <div class="connection c4"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section section-light">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Overview</span>
+                <h2 class="section-title">What is DERMA-Agent?</h2>
+                <p class="section-description">
+                    DERMA-Agent is an autonomous AI framework for cancer pathology research that combines 
+                    knowledge graphs, parallel hypothesis testing, and advanced image analysis to accelerate 
+                    scientific discovery.
+                </p>
+            </div>
+
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <div class="card-icon">🎯</div>
+                    <h3>Autonomous Discovery</h3>
+                    <p>AI-driven hypothesis generation and testing with self-correcting code execution. Tests multiple hypotheses in parallel using real clinical data.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon">🧠</div>
+                    <h3>Knowledge Fabric</h3>
+                    <p>Medical knowledge graph with 50+ nodes (genes, drugs, pathways, cancers). Guides hypothesis generation with evidence-based relationships.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon">📊</div>
+                    <h3>TCGA Integration</h3>
+                    <p>Direct access to 20+ cancer cohorts from The Cancer Genome Atlas. Automatic survival data preparation and clinical feature extraction.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon">🔬</div>
+                    <h3>Pathology AI</h3>
+                    <p>Advanced segmentation and feature extraction from histopathology images. Detects nuclei, analyzes texture, and generates quantitative metrics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- For Scientists Section -->
+    <section id="science" class="section section-dark">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">For Scientists</span>
+                <h2 class="section-title">How Scientists Use DERMA-Agent</h2>
+                <p class="section-description">
+                    Transform your cancer research workflow with AI-powered discovery tools
+                </p>
+            </div>
+
+            <div class="science-content">
+                <div class="science-intro">
+                    <h3>🎯 Research Applications</h3>
+                    <p>DERMA-Agent helps oncologists, pathologists, and researchers:</p>
+                </div>
+
+                <div class="applications-grid">
+                    <div class="app-card">
+                        <div class="app-number">01</div>
+                        <h4>Narrow Down Research Focus</h4>
+                        <ul>
+                            <li>Identify promising biomarkers from thousands of candidates</li>
+                            <li>Discover unexpected gene-drug relationships</li>
+                            <li>Find novel therapeutic targets through knowledge graph traversal</li>
+                            <li>Filter hypotheses by statistical significance automatically</li>
+                        </ul>
+                        <div class="example-box">
+                            <strong>Example:</strong> "Analyze which genes in the PI3K pathway predict better response to immunotherapy in melanoma patients"
+                        </div>
+                    </div>
+
+                    <div class="app-card">
+                        <div class="app-number">02</div>
+                        <h4>Early Cancer Identification</h4>
+                        <ul>
+                            <li>Extract quantitative features from histopathology slides</li>
+                            <li>Correlate cellular patterns with survival outcomes</li>
+                            <li>Identify high-risk patient subgroups</li>
+                            <li>Generate predictive models for disease progression</li>
+                        </ul>
+                        <div class="example-box">
+                            <strong>Example:</strong> "Quantify lymphocyte density in tumor margins and correlate with 5-year survival"
+                        </div>
+                    </div>
+
+                    <div class="app-card">
+                        <div class="app-number">03</div>
+                        <h4>Survival Analysis</h4>
+                        <ul>
+                            <li>Kaplan-Meier survival curve generation</li>
+                            <li>Cox proportional hazards regression</li>
+                            <li>Machine learning survival prediction</li>
+                            <li>Risk stratification based on multi-factor analysis</li>
+                        </ul>
+                        <div class="example-box">
+                            <strong>Example:</strong> "Build Random Forest model predicting survival using age, stage, and mutation status"
+                        </div>
+                    </div>
+
+                    <div class="app-card">
+                        <div class="app-number">04</div>
+                        <h4>Knowledge Discovery</h4>
+                        <ul>
+                            <li>Query medical knowledge graph for relationships</li>
+                            <li>Find paths between genes and diseases</li>
+                            <li>Discover drug repurposing opportunities</li>
+                            <li>Validate hypotheses against existing literature</li>
+                        </ul>
+                        <div class="example-box">
+                            <strong>Example:</strong> "What drugs target genes frequently mutated in triple-negative breast cancer?"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-section">
+                    <h3>🔬 Typical Research Workflow</h3>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="step-icon">1</div>
+                            <div class="step-content">
+                                <h4>Define Research Question</h4>
+                                <p>"What molecular features predict immunotherapy response in lung cancer?"</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">2</div>
+                            <div class="step-content">
+                                <h4>Query Knowledge Graph</h4>
+                                <p>Find relevant genes, pathways, and existing treatments related to lung cancer immunotherapy</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">3</div>
+                            <div class="step-content">
+                                <h4>Fetch TCGA Data</h4>
+                                <p>Retrieve clinical and genomic data for lung adenocarcinoma (TCGA-LUAD)</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">4</div>
+                            <div class="step-content">
+                                <h4>Generate Hypotheses</h4>
+                                <p>AI generates testable hypotheses based on knowledge and data</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">5</div>
+                            <div class="step-content">
+                                <h4>Test & Validate</h4>
+                                <p>Parallel execution of survival analysis and ML models</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">6</div>
+                            <div class="step-content">
+                                <h4>Results & Insights</h4>
+                                <p>Significant findings with p-values, hazard ratios, and visualizations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Step-by-Step Tutorial Section -->
+    <section id="tutorial" class="section section-light">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Tutorial</span>
+                <h2 class="section-title">Step-by-Step Usage Guide</h2>
+                <p class="section-description">
+                    Get started with DERMA-Agent in minutes
+                </p>
+            </div>
+
+            <div class="tutorial-nav">
+                <button class="tutorial-tab active" data-tab="installation">Installation</button>
+                <button class="tutorial-tab" data-tab="quickstart">Quick Start</button>
+                <button class="tutorial-tab" data-tab="knowledge">Knowledge Graph</button>
+                <button class="tutorial-tab" data-tab="discovery">Discovery</button>
+                <button class="tutorial-tab" data-tab="pathology">Pathology</button>
+                <button class="tutorial-tab" data-tab="dashboard">Dashboard</button>
+            </div>
+
+            <!-- Installation Tab -->
+            <div class="tutorial-content active" id="installation">
+                <h3>📦 Installation</h3>
+                <div class="step-block">
+                    <h4>Step 1: Clone the Repository</h4>
+                    <div class="code-block">
+                        <pre><code>git clone https://github.com/sgmoorthy/DERMA-Agent.git
+cd DERMA-Agent</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 2: Create Virtual Environment (Recommended)</h4>
+                    <div class="code-block">
+                        <pre><code># Windows
+python -m venv venv
+venv\Scripts\activate
+
+# macOS/Linux
+python3 -m venv venv
+source venv/bin/activate</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 3: Install Dependencies</h4>
+                    <div class="code-block">
+                        <pre><code>pip install -r requirements.txt</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <p class="step-note">📋 This installs 30+ packages including: langgraph, langchain-openai, pandas, scikit-learn, lifelines, streamlit, plotly, networkx, opencv-python</p>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 4: Set API Key (Optional)</h4>
+                    <div class="code-block">
+                        <pre><code># Windows (PowerShell)
+$env:OPENAI_API_KEY="your-api-key-here"
+
+# macOS/Linux (Bash)
+export OPENAI_API_KEY="your-api-key-here"
+
+# Or create .env file
+echo "OPENAI_API_KEY=your-api-key-here" > .env</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <p class="step-note">⚠️ Without API key, the agent runs in MOCK MODE with limited functionality</p>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 5: Verify Installation</h4>
+                    <div class="code-block">
+                        <pre><code>python demo_quickstart.py</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <p class="step-note">✅ This runs a quick demo testing all components</p>
+                </div>
+            </div>
+
+            <!-- Quick Start Tab -->
+            <div class="tutorial-content" id="quickstart">
+                <h3>🚀 Quick Start (5 Minutes)</h3>
+                
+                <div class="step-block">
+                    <h4>Option 1: Run the Quick Demo</h4>
+                    <div class="code-block">
+                        <pre><code>python demo_quickstart.py</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <p class="step-note">This demonstrates all features: Knowledge Graph, Data Client, Pathology, and Discovery Engine</p>
+                </div>
+
+                <div class="step-block">
+                    <h4>Option 2: Launch the Dashboard</h4>
+                    <div class="code-block">
+                        <pre><code>streamlit run app_enhanced.py</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <p class="step-note">Opens interactive web dashboard at http://localhost:8501</p>
+                </div>
+
+                <div class="step-block">
+                    <h4>Option 3: Run Discovery on Specific Cancer</h4>
+                    <div class="code-block">
+                        <pre><code>python -c "from agents.discovery_engine import run_fast_discovery
+run_fast_discovery(['Breast Cancer', 'Skin Cancer'])</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <p class="step-note">Runs AI-driven discovery on Breast and Skin cancer cohorts</p>
+                </div>
+
+                <div class="step-block">
+                    <h4>Option 4: Open Jupyter Notebook</h4>
+                    <div class="code-block">
+                        <pre><code>jupyter notebook notebooks/comprehensive_demo.ipynb</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <p class="step-note">Interactive tutorial with step-by-step examples</p>
+                </div>
+            </div>
+
+            <!-- Knowledge Graph Tab -->
+            <div class="tutorial-content" id="knowledge">
+                <h3>🧠 Using the Knowledge Fabric</h3>
+                
+                <div class="step-block">
+                    <h4>Step 1: Create/Load Knowledge Graph</h4>
+                    <div class="code-block">
+                        <pre><code>from tools.knowledge_fabric import create_default_knowledge_fabric
+
+# Create with default oncology knowledge base
+kg = create_default_knowledge_fabric("data/knowledge_fabric.json")
+
+# Or load existing
+# kg = KnowledgeFabric.load("data/knowledge_fabric.json")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 2: Query the Knowledge Graph</h4>
+                    <div class="code-block">
+                        <pre><code># Get statistics
+stats = kg.get_statistics()
+print(f"Nodes: {stats['total_nodes']}, Edges: {stats['total_edges']}")
+
+# Find drugs treating a specific cancer
+drugs = kg.find_paths("BRAF", "Melanoma", max_depth=2)
+for path in drugs:
+    print(" → ".join([node.id for node in path]))
+
+# Semantic search
+cancer_nodes = kg.semantic_search("melanoma skin cancer")
+for node in cancer_nodes:
+    print(f"{node.id}: {node.properties.get('description', '')}")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 3: Add Custom Knowledge</h4>
+                    <div class="code-block">
+                        <pre><code>from tools.knowledge_fabric import Node, Edge
+
+# Add custom gene
+kg.add_node(Node(
+    id="MY_NEW_GENE",
+    type="Gene",
+    properties={"full_name": "My New Gene", "chromosome": "17"}
+))
+
+# Add relationship
+kg.add_edge(Edge(
+    source="MY_NEW_GENE",
+    target="Melanoma",
+    relation="MUTATED_IN",
+    properties={"frequency": "15%", "source": "custom_study"}
+))</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 4: Save Knowledge Graph</h4>
+                    <div class="code-block">
+                        <pre><code>kg.save("data/knowledge_fabric.json")
+print("Knowledge graph saved!")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discovery Tab -->
+            <div class="tutorial-content" id="discovery">
+                <h3>🔬 Running Discovery</h3>
+                
+                <div class="step-block">
+                    <h4>Step 1: Configure Discovery</h4>
+                    <div class="code-block">
+                        <pre><code>from agents.discovery_engine import DiscoveryConfig
+
+config = DiscoveryConfig(
+    max_iterations=3,              # Self-correction attempts
+    parallel_workers=4,              # Parallel hypothesis testing
+    hypothesis_per_cohort=5,       # Hypotheses per cancer type
+    significance_threshold=0.05,     # P-value threshold
+    use_knowledge_fabric=True,       # Use knowledge graph
+    auto_correct_errors=True,        # Auto-fix code errors
+    timeout_seconds=120              # Max execution time
+)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 2: Run Discovery on Single Cohort</h4>
+                    <div class="code-block">
+                        <pre><code>from agents.discovery_engine import FastDiscoveryEngine
+from tools.knowledge_fabric import create_default_knowledge_fabric
+
+# Load knowledge graph
+kg = create_default_knowledge_fabric("data/knowledge_fabric.json")
+
+# Initialize engine
+engine = FastDiscoveryEngine(config, kg)
+
+# Run discovery
+results = engine.discover_single_cohort(
+    project_id="TCGA-BRCA",
+    cancer_name="Breast Cancer"
+)
+
+print(f"Tested {len(results)} hypotheses")
+print(f"Significant findings: {len([r for r in results if r.significant])}")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 3: Run Discovery on Multiple Cohorts</h4>
+                    <div class="code-block">
+                        <pre><code>from agents.discovery_engine import run_fast_discovery
+
+# Run on multiple cancer types
+results = run_fast_discovery(
+    cancer_types=["Breast Cancer", "Skin Cancer", "Lung Cancer"],
+    config=config
+)
+
+# Results saved to discoveries/discovery_report_*.json</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 4: Analyze Results</h4>
+                    <div class="code-block">
+                        <pre><code># Print results
+for result in results:
+    print(f"\nHypothesis: {result.hypothesis[:80]}...")
+    print(f"P-value: {result.p_value}")
+    print(f"Significant: {result.significant}")
+    print(f"Execution time: {result.execution_time:.2f}s")
+    if result.figures:
+        print(f"Generated {len(result.figures)} figures")
+
+# Save ledger
+engine.save_ledger("discoveries/my_discovery.json")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pathology Tab -->
+            <div class="tutorial-content" id="pathology">
+                <h3>🔍 Pathology Analysis</h3>
+                
+                <div class="step-block">
+                    <h4>Step 1: Analyze Image Tile</h4>
+                    <div class="code-block">
+                        <pre><code>from tools.enhanced_pathology import TissueAnalyzer, create_synthetic_pathology_image
+import matplotlib.pyplot as plt
+
+# Create or load image
+image = create_synthetic_pathology_image((512, 512), pattern='mixed')
+
+# Initialize analyzer
+analyzer = TissueAnalyzer()
+
+# Analyze tile
+features = analyzer.analyze_tile(image)
+
+print(f"Nuclei count: {features.nuclei_count}")
+print(f"Cellularity: {features.cellularity:.3f}")
+print(f"Tissue area ratio: {features.tissue_area_ratio:.3f}")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 2: Segment Nuclei</h4>
+                    <div class="code-block">
+                        <pre><code>from tools.enhanced_pathology import NucleiSegmenter
+
+# Initialize segmenter
+segmenter = NucleiSegmenter(method='hsv')  # Options: hsv, lab, adaptive
+
+# Segment nuclei
+mask = segmenter.segment_nuclei(image)
+nuclei_info = segmenter.extract_nuclei_features(image, mask)
+
+print(f"Detected {len(nuclei_info)} nuclei")
+
+# Visualize
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(image)
+axes[0].set_title('Original')
+axes[1].imshow(mask, cmap='gray')
+axes[1].set_title('Segmentation Mask')
+axes[2].imshow(image)
+axes[2].imshow(mask, alpha=0.3, cmap='Reds')
+axes[2].set_title('Overlay')
+plt.show()</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step-block">
+                    <h4>Step 3: Extract Texture Features</h4>
+                    <div class="code-block">
+                        <pre><code># Texture features are automatically extracted
+if features.texture_features:
+    texture = features.texture_features
+    print(f"GLCM Contrast: {texture.get('contrast', 0):.3f}")
+    print(f"GLCM Homogeneity: {texture.get('homogeneity', 0):.3f}")
+    print(f"LBP Uniformity: {texture.get('lbp_uniformity', 0):.3f}")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div class="tutorial-content" id="dashboard">
+                <h3>🖥️ Using the Dashboard</h3>
+                
+                <div class="step-block">
+                    <h4>Launch Dashboard</h4>
+                    <div class="code-block">
+                        <pre><code>streamlit run app_enhanced.py</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <p class="step-note">Opens at http://localhost:8501</p>
+                </div>
+
+                <div class="dashboard-tabs">
+                    <div class="dash-tab">
+                        <h4>📚 Knowledge Fabric Tab</h4>
+                        <ul>
+                            <li>Query medical knowledge graph</li>
+                            <li>Search for genes, drugs, pathways</li>
+                            <li>View graph statistics</li>
+                            <li>Find relationships between entities</li>
+                        </ul>
+                    </div>
+                    <div class="dash-tab">
+                        <h4>🔬 Discovery Tab</h4>
+                        <ul>
+                            <li>Configure discovery parameters</li>
+                            <li>Run hypothesis testing</li>
+                            <li>View results in real-time</li>
+                            <li>Filter significant findings</li>
+                        </ul>
+                    </div>
+                    <div class="dash-tab">
+                        <h4>📊 Data Explorer Tab</h4>
+                        <ul>
+                            <li>Browse TCGA cohorts</li>
+                            <li>View survival analysis plots</li>
+                            <li>Generate Kaplan-Meier curves</li>
+                            <li>Explore clinical features</li>
+                        </ul>
+                    </div>
+                    <div class="dash-tab">
+                        <h4>🔍 Pathology Tab</h4>
+                        <ul>
+                            <li>Upload histopathology images</li>
+                            <li>Segment nuclei automatically</li>
+                            <li>View saliency heatmaps</li>
+                            <li>Extract quantitative features</li>
+                        </ul>
+                    </div>
+                    <div class="dash-tab">
+                        <h4>⚙️ Settings Tab</h4>
+                        <ul>
+                            <li>Configure API keys</li>
+                            <li>Set discovery parameters</li>
+                            <li>Choose cancer cohorts</li>
+                            <li>Manage cache settings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Expected Results Section -->
+    <section id="results" class="section section-dark">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Results</span>
+                <h2 class="section-title">What to Expect from DERMA-Agent</h2>
+                <p class="section-description">
+                    Real outputs, visualizations, and insights generated by the agent
+                </p>
+            </div>
+
+            <div class="results-grid">
+                <!-- Knowledge Graph Results -->
+                <div class="result-card">
+                    <h3>🧠 Knowledge Graph Output</h3>
+                    <div class="result-preview">
+                        <div class="code-output">
+<pre>Knowledge Graph Statistics:
+━━━━━━━━━━━━━━━━━━━━━━━
+Total Nodes: 50
+Total Edges: 85
+Graph Density: 0.0692
+
+Node Types:
+  • Gene: 15 nodes
+  • Drug: 10 nodes
+  • Disease: 5 nodes
+  • Pathway: 8 nodes
+  • Protein: 7 nodes
+  • Clinical_Feature: 5 nodes
+
+Sample Query - Drugs treating Melanoma:
+  • Pembrolizumab: response_rate=40%
+  • Ipilimumab: response_rate=15%
+  • Dabrafenib: response_rate=50%
+  • Trametinib: response_rate=22%
+
+Path Finding (BRAF → Melanoma):
+  BRAF → MUTATED_IN → Melanoma [frequency=50%]
+  BRAF → PART_OF → MAPK_Pathway → INVOLVED_IN → Melanoma</pre>
+                        </div>
+                    </div>
+                    <div class="result-description">
+                        <h4>What This Means:</h4>
+                        <p>The knowledge graph provides structured medical knowledge with quantified relationships. Scientists can:</p>
+                        <ul>
+                            <li>Quickly find all drugs targeting specific cancers</li>
+                            <li>Discover gene-disease relationships with mutation frequencies</li>
+                            <li>Navigate biological pathways</li>
+                            <li>Validate hypotheses against existing knowledge</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Discovery Results -->
+                <div class="result-card">
+                    <h3>🔬 Discovery Engine Output</h3>
+                    <div class="result-preview">
+                        <div class="code-output">
+<pre>Discovery Results for TCGA-BRCA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Hypothesis 1: ✅ SIGNIFICANT
+Statement: High CD8+ T-cell infiltration correlates with better survival in HER2+ breast cancer
+P-value: 0.023 (significant at α=0.05)
+Hazard Ratio: 0.67 (95% CI: 0.48-0.93)
+Test: Cox Proportional Hazards
+Execution Time: 2.4s
+
+Hypothesis 2: ✅ SIGNIFICANT  
+Statement: PIK3CA mutation predicts resistance to hormone therapy
+P-value: 0.041
+Hazard Ratio: 1.45 (95% CI: 1.12-1.88)
+Test: Kaplan-Meier + Log-rank
+Execution Time: 3.1s
+
+Hypothesis 3: ❌ NOT SIGNIFICANT
+Statement: Age >65 predicts worse outcomes independent of stage
+P-value: 0.127 (not significant)
+Test: Random Forest Classifier
+Execution Time: 1.8s
+
+Summary:
+  • Total Hypotheses: 3
+  • Significant: 2 (66.7%)
+  • Avg Execution Time: 2.4s
+  • Results saved to: discoveries/ledger_TCGA-BRCA.json</pre>
+                        </div>
+                    </div>
+                    <div class="result-description">
+                        <h4>What This Means:</h4>
+                        <p>AI-generated hypotheses tested against real clinical data with statistical validation:</p>
+                        <ul>
+                            <li><strong>P-value &lt; 0.05:</strong> Statistically significant finding</li>
+                            <li><strong>Hazard Ratio &lt; 1:</strong> Protective factor (better survival)</li>
+                            <li><strong>Hazard Ratio &gt; 1:</strong> Risk factor (worse survival)</li>
+                            <li>Auto-generated visualizations: Kaplan-Meier curves, forest plots</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Survival Analysis Plot -->
+                <div class="result-card full-width">
+                    <h3>📊 Survival Analysis Visualization</h3>
+                    <div class="chart-container">
+                        <canvas id="kaplanMeierChart"></canvas>
+                    </div>
+                    <div class="chart-description">
+                        <h4>Kaplan-Meier Survival Curves</h4>
+                        <p>Automatically generated by the agent showing:</p>
+                        <ul>
+                            <li><strong>Blue line:</strong> Low lymphocyte density group (worse survival)</li>
+                            <li><strong>Orange line:</strong> High lymphocyte density group (better survival)</li>
+                            <li><strong>Shaded areas:</strong> 95% confidence intervals</li>
+                            <li><strong>P-value:</strong> Statistical significance of difference</li>
+                            <li><strong>N:</strong> Number at risk at each time point</li>
+                        </ul>
+                        <p><strong>Interpretation:</strong> Higher immune cell infiltration is associated with significantly better survival outcomes (p=0.023), suggesting immunotherapy may be more effective in these patients.</p>
+                    </div>
+                </div>
+
+                <!-- ML Model Output -->
+                <div class="result-card">
+                    <h3>🤖 Machine Learning Results</h3>
+                    <div class="result-preview">
+                        <div class="code-output">
+<pre>Random Forest Survival Model:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Model Performance:
+  C-index (Concordance): 0.74
+  Cross-validation Score: 0.72 ± 0.03
+  
+Feature Importance:
+  1. Tumor Stage: 0.28 ████████████
+  2. Age: 0.21 █████████
+  3. Mutation Count: 0.18 ████████
+  4. Lymphocyte Density: 0.15 ██████
+  5. Treatment Type: 0.12 █████
+  6. Gender: 0.06 ██
+
+Risk Stratification:
+  Low Risk (n=150):  5-year survival = 85%
+  Medium Risk (n=200): 5-year survival = 62%
+  High Risk (n=120): 5-year survival = 34%
+
+Model predicts survival with 74% accuracy
+(better than stage alone: 68%)</pre>
+                        </div>
+                    </div>
+                    <div class="result-description">
+                        <h4>What This Means:</h4>
+                        <p>ML model identifies key prognostic factors and stratifies patients:</p>
+                        <ul>
+                            <li><strong>C-index 0.74:</strong> Good predictive accuracy (0.5=random, 1.0=perfect)</li>
+                            <li><strong>Feature importance:</strong> Shows which factors most influence survival</li>
+                            <li><strong>Risk groups:</strong> Enables personalized treatment planning</li>
+                            <li>Outperforms traditional staging alone</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Pathology Output -->
+                <div class="result-card">
+                    <h3>🔍 Pathology Analysis Output</h3>
+                    <div class="result-preview">
+                        <div class="code-output">
+<pre>Histopathology Analysis:
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tile Analysis (512x512 pixels):
+  Nuclei Count: 1,247
+  Nuclei Density: 0.0048 nuclei/pixel²
+  Mean Nuclei Size: 89.3 μm²
+  Cellularity: 0.34 (34% of tissue)
+  
+Texture Features (GLCM):
+  Contrast: 0.23 (low variation)
+  Homogeneity: 0.67 (high uniformity)
+  Energy: 0.15 (moderate regularity)
+  Entropy: 4.82 (moderate complexity)
+  
+Tissue Classification:
+  Tumor Area: 65%
+  Stroma Area: 28%
+  Necrosis: 5%
+  Normal: 2%
+  
+Prognostic Score: 6.8/10
+  (Higher cellularity + texture irregularity
+   suggests more aggressive tumor)</pre>
+                        </div>
+                    </div>
+                    <div class="result-description">
+                        <h4>What This Means:</h4>
+                        <p>Quantitative features extracted from histopathology images:</p>
+                        <ul>
+                            <li><strong>Cellularity:</strong> Percentage of tissue occupied by cells (high = more aggressive)</li>
+                            <li><strong>Texture:</strong> Measures cellular organization (irregular = worse prognosis)</li>
+                            <li><strong>Nuclei count:</strong> Indicator of proliferation rate</li>
+                            <li>Provides objective, reproducible measurements for diagnosis</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Dashboard Screenshot -->
+                <div class="result-card full-width">
+                    <h3>🖥️ Interactive Dashboard Output</h3>
+                    <div class="dashboard-preview">
+                        <div class="mock-dashboard">
+                            <div class="mock-header">
+                                <span>🔬 DERMA-Agent Dashboard</span>
+                            </div>
+                            <div class="mock-tabs">
+                                <span class="active">Knowledge</span>
+                                <span>Discovery</span>
+                                <span>Data</span>
+                                <span>Pathology</span>
+                            </div>
+                            <div class="mock-content">
+                                <div class="mock-panel">
+                                    <h5>Query Knowledge Graph</h5>
+                                    <div class="mock-input">Search: BRAF melanoma</div>
+                                    <div class="mock-results">
+                                        <div class="mock-result-item">🧬 BRAF → MUTATED_IN → Melanoma (50%)</div>
+                                        <div class="mock-result-item">💊 Vemurafenib → TARGETS → BRAF</div>
+                                        <div class="mock-result-item">🧬 BRAF → PART_OF → MAPK Pathway</div>
+                                    </div>
+                                </div>
+                                <div class="mock-chart">
+                                    <div class="mock-chart-title">Knowledge Graph Visualization</div>
+                                    <div class="mock-nodes">
+                                        <div class="mock-node gene">BRAF</div>
+                                        <div class="mock-node disease">Melanoma</div>
+                                        <div class="mock-node drug">Vemurafenib</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-description">
+                        <h4>Dashboard Features:</h4>
+                        <ul>
+                            <li><strong>Interactive queries:</strong> Natural language search of knowledge graph</li>
+                            <li><strong>Real-time discovery:</strong> Watch hypothesis generation and testing live</li>
+                            <li><strong>Visual analytics:</strong> Plotly charts with zoom, pan, export</li>
+                            <li><strong>No-code interface:</strong> Run complex analyses without programming</li>
+                            <li><strong>Export results:</strong> Download JSON, CSV, PNG outputs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expected Timeline -->
+            <div class="timeline-section">
+                <h3>⏱️ Expected Timeline for Results</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="time">5 min</div>
+                        <div class="event">Setup and first demo run</div>
+                        <div class="output">Quick demo completes, all components verified</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time">15 min</div>
+                        <div class="event">Knowledge graph query</div>
+                        <div class="output">Identify 10+ relevant genes/drugs for your cancer type</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time">30 min</div>
+                        <div class="event">Single cohort discovery</div>
+                        <div class="output">5-10 hypotheses tested, 2-3 significant findings</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time">1-2 hours</div>
+                        <div class="event">Multi-cohort analysis</div>
+                        <div class="output">Comprehensive report with survival curves and ML predictions</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time">3-4 hours</div>
+                        <div class="event">Full pathology integration</div>
+                        <div class="output">Quantitative image features correlated with clinical outcomes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Accelerate Your Cancer Research?</h2>
+                <p>Join researchers using DERMA-Agent to discover new biomarkers, identify high-risk patients, and accelerate therapeutic discovery.</p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/sgmoorthy/DERMA-Agent" class="btn btn-primary btn-large" target="_blank">
+                        <span class="icon">📥</span> Get Started on GitHub
+                    </a>
+                    <a href="#tutorial" class="btn btn-secondary btn-large">
+                        <span class="icon">📖</span> Read Tutorial
+                    </a>
+                </div>
+                <div class="github-stats">
+                    <div class="gh-stat">
+                        <span class="gh-number">⭐ Star</span>
+                        <span class="gh-label">on GitHub</span>
+                    </div>
+                    <div class="gh-stat">
+                        <span class="gh-number">🍴 Fork</span>
+                        <span class="gh-label">to contribute</span>
+                    </div>
+                    <div class="gh-stat">
+                        <span class="gh-number">🐛 Issues</span>
+                        <span class="gh-label">for support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo">🔬</span>
+                    <span class="brand-text">DERMA-Agent</span>
+                    <p class="footer-tagline">AI-Powered Cancer Pathology Discovery</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent" target="_blank">GitHub Repository</a></li>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/blob/main/README.md" target="_blank">Documentation</a></li>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/blob/main/CHANGELOG.md" target="_blank">Changelog</a></li>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/issues" target="_blank">Issues</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Community</h4>
+                        <ul>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/discussions" target="_blank">Discussions</a></li>
+                            <li><a href="#">Research Papers</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Connect</h4>
+                        <ul>
+                            <li><a href="mailto:contact@derma-agent.org">Email</a></li>
+                            <li><a href="#">Twitter</a></li>
+                            <li><a href="#">LinkedIn</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 DERMA-Agent Contributors. Licensed under MIT License.</p>
+                <p>Built with ❤️ for the cancer research community</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
