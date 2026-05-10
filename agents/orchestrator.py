@@ -7,10 +7,10 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import StateGraph, END
 from tools.clinical_stats import execute_codeact
-from tools.gdc_client import fetch_tcga_skcm_clinical_data
+from tools.gdc_client import fetch_tcga_clinical_data
 
 # Define the Knowledge State Data Structure (KSDS)
-class AgentState(TypedDict):
+class AgentState(TypedDict, total=False):
     messages: Annotated[List[Any], operator.add]
     current_hypothesis: str
     python_code: str
@@ -18,6 +18,8 @@ class AgentState(TypedDict):
     ledger: List[Dict[str, str]]
     iteration: int
     data_context: Any # pd.DataFrame
+    project_id: str
+    cancer_type: str
 
 # To use Anthropic or Gemini, uncomment the respective lines and import:
 # from langchain_anthropic import ChatAnthropic
@@ -36,8 +38,10 @@ def get_llm():
 
 def fetch_data_node(state: AgentState):
     """Initial node to fetch clinical data."""
-    print("Agent: Fetching clinical data...")
-    df = fetch_tcga_skcm_clinical_data()
+    project_id = state.get("project_id", "TCGA-SKCM")
+    cancer_type = state.get("cancer_type", "Skin Cancer")
+    print(f"Agent: Fetching {cancer_type} clinical data...")
+    df = fetch_tcga_clinical_data(project_id=project_id)
     return {"data_context": df}
 
 def formulate_hypothesis_node(state: AgentState):
@@ -50,10 +54,11 @@ def formulate_hypothesis_node(state: AgentState):
     df = state.get("data_context")
     columns = df.columns.tolist() if df is not None else []
     
+    cancer_type = state.get("cancer_type", "Skin Cancer")
     prompt = f"""
     Act as a Bioinformatics AI Agent.
     Available clinical data columns: {columns}
-    Formulate a single, testable hypothesis about skin cancer pathology using these columns.
+    Formulate a single, testable hypothesis about {cancer_type} pathology using these columns.
     Return ONLY the hypothesis text.
     """
     response = llm.invoke([HumanMessage(content=prompt)])
@@ -172,21 +177,28 @@ def build_graph():
     
     return workflow.compile()
 
-def run_agent_workflow():
+def run_agent_workflow(project_id: str = "TCGA-SKCM", cancer_type: str = "Skin Cancer"):
     """Runs the workflow and saves the ledger."""
     app = build_graph()
-    initial_state = {"messages": [], "ledger": [], "iteration": 0}
+    initial_state = {
+        "messages": [], 
+        "ledger": [], 
+        "iteration": 0,
+        "project_id": project_id,
+        "cancer_type": cancer_type
+    }
     
-    print("Starting SPARK Agent Workflow...")
+    print(f"Starting SPARK Agent Workflow for {cancer_type}...")
     final_state = app.invoke(initial_state)
     
     # Save scientific ledger to JSON for the Streamlit UI to read
-    with open("ledger.json", "w") as f:
+    ledger_file = f"ledger_{project_id}.json"
+    with open(ledger_file, "w") as f:
         # We need to make sure the dataframe isn't serialized
         clean_ledger = final_state.get("ledger", [])
         json.dump(clean_ledger, f, indent=4)
         
-    print("Workflow complete. Ledger saved to ledger.json.")
+    print(f"Workflow complete. Ledger saved to {ledger_file}.")
     return final_state
 
 if __name__ == "__main__":

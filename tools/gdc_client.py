@@ -4,9 +4,16 @@ from typing import Optional
 
 GDC_API_BASE = "https://api.gdc.cancer.gov"
 
-def fetch_tcga_skcm_clinical_data(limit: int = 100) -> Optional[pd.DataFrame]:
+CANCER_PROJECTS = {
+    "Skin Cancer": "TCGA-SKCM",
+    "Breast Cancer": "TCGA-BRCA",
+    "Lung Cancer": "TCGA-LUAD",
+    "Brain Cancer": "TCGA-GBM"
+}
+
+def fetch_tcga_clinical_data(project_id: str = "TCGA-SKCM", limit: int = 100) -> Optional[pd.DataFrame]:
     """
-    Fetches clinical metadata for the TCGA-SKCM (Skin Cutaneous Melanoma) cohort.
+    Fetches clinical metadata for the given TCGA cohort.
     Returns a Pandas DataFrame.
     """
     endpoint = f"{GDC_API_BASE}/cases"
@@ -15,7 +22,7 @@ def fetch_tcga_skcm_clinical_data(limit: int = 100) -> Optional[pd.DataFrame]:
         "op": "in",
         "content": {
             "field": "cases.project.project_id",
-            "value": ["TCGA-SKCM"]
+            "value": [project_id]
         }
     }
     
@@ -69,5 +76,5 @@ def fetch_tcga_skcm_clinical_data(limit: int = 100) -> Optional[pd.DataFrame]:
         })
 
 if __name__ == "__main__":
-    df = fetch_tcga_skcm_clinical_data(limit=5)
+    df = fetch_tcga_clinical_data(project_id="TCGA-BRCA", limit=5)
     print(df.head())
