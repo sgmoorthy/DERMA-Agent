@@ -9,7 +9,7 @@ langchain-community>=0.2.0
 lifelines>=0.28.0
 scipy>=1.12.0
 scikit-learn>=1.4.0
-xgbse>=0.4.0
+xgbse>=0.3.0
 shap>=0.44.0
 
 # Knowledge Fabric & Graph
