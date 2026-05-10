@@ -11,6 +11,7 @@ from dataclasses import dataclass, field, asdict
 from collections import defaultdict
 import networkx as nx
 import numpy as np
+import pandas as pd
 from pathlib import Path
 
 
@@ -405,11 +406,9 @@ class MedicalKnowledgeBuilder:
         return kg
     
     @staticmethod
-    def enrich_with_tcga_data(kg: KnowledgeFabric, clinical_df: 'pd.DataFrame', 
+    def enrich_with_tcga_data(kg: KnowledgeFabric, clinical_df: pd.DataFrame, 
                               cancer_type: str) -> KnowledgeFabric:
         """Enrich knowledge graph with TCGA clinical data patterns."""
-        import pandas as pd
-        
         # Add derived clinical patterns
         if 'vital_status' in clinical_df.columns:
             survival_rate = (clinical_df['vital_status'] == 'Alive').mean()
