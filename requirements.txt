@@ -32,6 +32,7 @@ tqdm>=4.66.0
 
 # Pathology & Imaging
 tiffslide>=2.3.0
+numcodecs==0.12.1  # Pin for zarr compatibility
 tiatoolbox>=1.4.0
 scikit-image>=0.21.0
 opencv-python>=4.9.0
