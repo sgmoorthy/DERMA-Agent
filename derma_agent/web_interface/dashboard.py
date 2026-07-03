@@ -607,7 +607,7 @@ def _render_chat_panel(cohort: str, fabric: KnowledgeFabric) -> None:
             <div>
                 <div style='color:#a5b4fc; font-size:1.15rem; font-weight:700;
                             letter-spacing:.4px;'>
-                    DERMA-Agent Research Assistant
+                    DermaMind.ai Research Assistant
                 </div>
                 <div style='color:#64748b; font-size:.8rem; margin-top:2px;'>
                     Discuss findings, interpret results, and plan next experiments

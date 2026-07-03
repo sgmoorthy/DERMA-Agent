@@ -1,5 +1,5 @@
 /**
- * DERMA-Agent GitHub Pages - Main JavaScript
+ * DermaMind.ai GitHub Pages - Main JavaScript
  * Handles interactive elements, charts, and UI functionality
  */
 

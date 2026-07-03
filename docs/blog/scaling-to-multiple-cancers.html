@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scaling DermaMind.ai to a Multi-Oncology Framework | DermaMind.ai Blog</title>
+    <meta name="description" content="Read about the architectural evolution of DermaMind.ai from a single skin cancer agent to a generalized multi-oncology AI discovery platform.">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Extra styles for blog post structure */
+        .blog-header {
+            padding: 140px 0 60px 0;
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--dark) 100%);
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .blog-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to top, var(--white), transparent);
+            pointer-events: none;
+        }
+        .blog-meta {
+            font-size: 0.95rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .blog-title {
+            font-size: 2.75rem;
+            line-height: 1.2;
+            font-weight: 700;
+            max-width: 800px;
+            margin: 0 auto 1.5rem auto;
+        }
+        .blog-date {
+            color: var(--gray-400);
+            font-size: 0.9rem;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 1.5rem;
+        }
+        .blog-content {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: var(--gray-700);
+        }
+        .blog-content h2 {
+            font-size: 1.75rem;
+            color: var(--dark);
+            margin: 2.5rem 0 1rem 0;
+            font-weight: 700;
+        }
+        .blog-content h3 {
+            font-size: 1.35rem;
+            color: var(--dark-light);
+            margin: 2rem 0 1rem 0;
+            font-weight: 600;
+        }
+        .blog-content p {
+            margin-bottom: 1.5rem;
+        }
+        .blog-content ul {
+            margin: 0 0 1.5rem 2rem;
+        }
+        .blog-content li {
+            margin-bottom: 0.5rem;
+        }
+        .blog-content code {
+            font-family: var(--font-mono);
+            background: var(--gray-100);
+            padding: 0.2rem 0.4rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            color: var(--secondary);
+        }
+        .blog-content pre {
+            background: var(--gray-900);
+            color: var(--gray-100);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--gray-100);
+            font-size: 0.9rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: transform 0.2s;
+        }
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="nav-brand">
+                <span class="logo">🧬</span>
+                <span class="brand-text">DermaMind.ai</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#overview" class="nav-link">Overview</a></li>
+                <li><a href="../index.html#features" class="nav-link">Features</a></li>
+                <li><a href="../index.html#science" class="nav-link">For Scientists</a></li>
+                <li><a href="../index.html#tutorial" class="nav-link">Tutorial</a></li>
+                <li><a href="../index.html#results" class="nav-link">Results</a></li>
+                <li><a href="../index.html#blog" class="nav-link active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Header -->
+    <header class="blog-header">
+        <div class="container">
+            <div class="blog-meta">Latest Research & Development</div>
+            <h1 class="blog-title">Scaling the DermaMind.ai Pathology Agent: From Skin Cancer to a Multi-Oncology Framework</h1>
+            <div class="blog-date">Published: May 2026 &bull; By DermaMind.ai Team</div>
+        </div>
+    </header>
+
+    <!-- Blog Post Content -->
+    <main class="blog-container">
+        <a href="../index.html" class="back-link">&larr; Back to Home</a>
+        <article class="blog-content">
+            <p>When we first introduced the DermaMind.ai Autonomous Pathology Agent (inspired by the groundbreaking 2026 <em>Nature Medicine</em> paper), our primary objective was to build a functional MVP focused on Skin Cutaneous Melanoma (TCGA-SKCM). The agent successfully demonstrated a closed "Perception-Action" loop: pulling clinical metadata, extracting zero-shot features from Whole Slide Images (WSIs), formulating hypotheses, and writing dynamic Python code to statistically validate them using survival analysis.</p>
+
+            <p>Today, we are thrilled to announce a major architectural shift: <strong>DermaMind.ai is no longer just a Skin Cancer agent.</strong> We have upgraded the framework to support multiple oncology domains out-of-the-box, effectively transforming it into a generalized AI discovery platform for cancer pathology.</p>
+
+            <h2>The Motivation for Generalization</h2>
+
+            <p>Cancer is not a monolithic disease; the molecular and morphological features that govern survival in melanoma differ vastly from those in glioblastoma or lung adenocarcinoma. To make DermaMind.ai a truly useful tool for researchers, the underlying data engines and agent personas needed to be decoupled from a single disease context.</p>
+
+            <p>We needed a system where the "Brain" (the LLM Orchestrator) could dynamically switch specializations, and the "Hands" (the Data and Execution engines) could context-switch to the appropriate cohort data without hardcoding.</p>
+
+            <h2>What's New Under the Hood?</h2>
+
+            <h3>1. Dynamic Data Engine (<code>enhanced_data_client.py</code>)</h3>
+            <p>Previously, our Genomic Data Commons (GDC) client was hardcoded to fetch only the <code>TCGA-SKCM</code> cohort. We've refactored the client to be entirely dynamic. By maintaining a mapping of <code>CANCER_PROJECTS</code>, the agent can now dynamically target the GDC API for:</p>
+            <ul>
+                <li><strong>Skin Cancer</strong> (<code>TCGA-SKCM</code>)</li>
+                <li><strong>Breast Cancer</strong> (<code>TCGA-BRCA</code>)</li>
+                <li><strong>Lung Cancer</strong> (<code>TCGA-LUAD</code>)</li>
+                <li><strong>Brain Cancer</strong> (<code>TCGA-GBM</code>)</li>
+            </ul>
+
+            <p>This means the agent now formulates its hypotheses based on the specific demographic and diagnostic nuances of the requested cancer type.</p>
+
+            <h3>2. Context-Aware Orchestration (<code>discovery_engine.py</code> / <code>research_assistant.py</code>)</h3>
+            <p>The orchestrator state has been expanded. It now carries explicit variables for <code>project_id</code> and <code>cancer_type</code>.</p>
+
+            <p>When the prompt is sent to the LLM (OpenAI, Anthropic, or Gemini), it injects this persona. Instead of a generic prompt, the agent is instructed: <em>"Act as a Bioinformatics AI Agent specializing in Breast Cancer pathology."</em> This contextual grounding drastically improves the relevance of the formulated hypotheses.</p>
+
+            <p>Furthermore, the agent's <strong>Scientific Ledger</strong> is now saved dynamically (e.g., <code>ledger_TCGA-BRCA.json</code>). This prevents context pollution—your lung cancer discoveries won't accidentally overwrite your breast cancer research!</p>
+
+            <h3>3. A Multi-Specialty UI Dashboard</h3>
+            <p>Our Streamlit interface has been upgraded to reflect this new multi-agent reality. Users will now see an <strong>Agent Configuration</strong> sidebar. By simply selecting an "Agent Specialty" from a dropdown, the dashboard instantly re-routes, loading the specific scientific ledger and context for that cancer type.</p>
+
+            <h3>4. CLI Argument Parsing</h3>
+            <p>For power users, the main execution loop now supports CLI parameters. Spinning up a specialized agent is as simple as running:</p>
+            <pre><code>python main.py --cancer breast</code></pre>
+
+            <h2>What's Next?</h2>
+            <p>By generalizing the data ingestion and orchestrator state, we've laid the groundwork for DermaMind.ai to scale to all 33 TCGA cancer types. Our immediate next steps involve enhancing the "Eyes" of the agent—upgrading our Whole Slide Image (WSI) analysis pipeline to process massive, multi-gigabyte pathology slides for these new cancer types natively.</p>
+
+            <p>We invite researchers and developers to clone the repository, test the different agent personas, and contribute to the open-source effort to accelerate pathology discoveries!</p>
+        </article>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo">🧬</span>
+                    <span class="brand-text">DermaMind.ai</span>
+                    <p class="footer-tagline">AI-Powered Cancer Pathology Discovery</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent" target="_blank">GitHub Repository</a></li>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/blob/main/README.md" target="_blank">Documentation</a></li>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/blob/main/CHANGELOG.md" target="_blank">Changelog</a></li>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/issues" target="_blank">Issues</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Community</h4>
+                        <ul>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+                            <li><a href="https://github.com/sgmoorthy/DERMA-Agent/discussions" target="_blank">Discussions</a></li>
+                            <li><a href="#">Research Papers</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Connect</h4>
+                        <ul>
+                            <li><a href="mailto:contact@derma-agent.org">Email</a></li>
+                            <li><a href="#">Twitter</a></li>
+                            <li><a href="#">LinkedIn</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 DermaMind.ai Contributors. Licensed under MIT License.</p>
+                <p>Built with ❤️ for the cancer research community</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

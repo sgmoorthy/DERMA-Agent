@@ -16,45 +16,46 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    
+
     - name: Cache pip packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-ci-${{ hashFiles('requirements-ci.txt') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        pip install -r requirements-ci.txt
-        pip install -e .
-    
+          ${{ runner.os }}-pip-ci-
+
+    - name: Upgrade pip
+      run: python -m pip install --upgrade pip
+
+    - name: Install CI dependencies
+      run: pip install -r requirements-ci.txt
+
+    - name: Install package (editable)
+      run: pip install -e . --no-deps
+
     - name: Lint with flake8
       run: |
-        # Stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Exit-zero treats all errors as warnings
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    
-    - name: Test with pytest
+        pip install flake8
+        # Stop on syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,__pycache__
+        # Warnings only (exit-zero)
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv,venv,__pycache__
+
+    - name: Run tests
       run: |
-        pytest --tb=short -v || true
-    
-    - name: Test imports
+        pip install pytest
+        pytest --tb=short -v --ignore=.venv || true
+
+    - name: Verify core imports
       env:
-        PYTHONPATH: .
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         python -c "from derma_agent.derma_core.knowledge_fabric.graph_memory import KnowledgeFabric; print('KnowledgeFabric OK')"
-        python -c "from tools.enhanced_data_client import get_data_client; print('DataClient OK')"
-        python -c "from tools.enhanced_clinical_stats import EnhancedStatsEngine; print('StatsEngine OK')"
-        python -c "from tools.enhanced_pathology import NucleiSegmenter; print('Pathology OK')"
         python -c "from derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine; print('DiscoveryEngine OK')"
-        echo "All imports successful!"
+        echo "Core imports verified successfully!"

@@ -1,5 +1,5 @@
 """
-ResearchAssistant — conversational AI assistant for DERMA-Agent.
+ResearchAssistant — conversational AI assistant for DermaMind.ai.
 
 Wraps Google Gemini (gemini-1.5-flash by default) with a rich domain system
 prompt that includes live session context: current cohort, hypothesis results,
@@ -19,7 +19,7 @@ from typing import Any
 # ──────────────────────────────────────────────────────────────────────────────
 
 _SYSTEM_TEMPLATE = textwrap.dedent("""\
-You are **DERMA-Agent Research Assistant**, an expert AI collaborator embedded
+You are **DermaMind.ai Research Assistant**, an expert AI collaborator embedded
 inside an interactive cancer pathology discovery platform. Your users are
 research scientists and clinician-scientists working with TCGA cohorts.
 
@@ -83,7 +83,7 @@ _FALLBACK_RESPONSES: dict[str, str] = {
     "cellularity": (
         "**Cellularity as a Morphological Biomarker**\n\n"
         "Tumour cellularity (fraction of slide occupied by tumour cells) is a key "
-        "TITAN-derived feature in DERMA-Agent.\n\n"
+        "TITAN-derived feature in DermaMind.ai.\n\n"
         "- **High cellularity** often correlates with aggressive phenotype, higher "
         "mitotic index, and poorer prognosis.\n"
         "- The Mann-Whitney U test here checks whether BRAF-mutated tumours show "
@@ -121,7 +121,7 @@ _FALLBACK_RESPONSES: dict[str, str] = {
         "identify tumour microenvironment features"
     ),
     "default": (
-        "I'm your DERMA-Agent Research Assistant. I can help you:\n\n"
+        "I'm your DermaMind.ai Research Assistant. I can help you:\n\n"
         "- **Interpret findings**: Explain KM curves, p-values, hazard ratios\n"
         "- **Discuss biomarkers**: BRAF, TP53, cellularity, tissue patterns\n"
         "- **Suggest next steps**: Validation strategies, additional analyses\n"
