@@ -1,5 +1,5 @@
 """
-Enhanced Pathology Utilities for DERMA-Agent
+Enhanced Pathology Utilities for DermaMind.ai
 Advanced image processing, segmentation, and feature extraction for histopathology.
 """
 

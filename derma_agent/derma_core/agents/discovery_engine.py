@@ -1,5 +1,5 @@
 """
-Fast Parallel Discovery Engine for DERMA-Agent
+Fast Parallel Discovery Engine for DermaMind.ai
 Implements high-performance hypothesis generation and testing with parallel execution.
 """
 

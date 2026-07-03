@@ -1,14 +1,26 @@
-# 🔬 DERMA-Agent: Enhanced Discovery Framework
+# 🧬 DermaMind.ai
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/sgmoorthy/DERMA-Agent/releases)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/sgmoorthy/DERMA-Agent/releases)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/sgmoorthy/DERMA-Agent/actions)
+[![CI](https://github.com/sgmoorthy/DERMA-Agent/actions/workflows/python-package.yml/badge.svg)](https://github.com/sgmoorthy/DERMA-Agent/actions)
 [![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-🚀 **v2.0.0 Release** - Major enhancement with Knowledge Fabric, Fast Discovery Engine, and Advanced Pathology
+> **Autonomous AI for Cancer Pathology Discovery**  
+> *From slides to survival insights: graph-powered AI that tests hypotheses, validates biomarkers, and accelerates oncology research.*
 
-An advanced agentic framework for autonomous scientific discovery in cancer pathology, with enhanced capabilities including a Knowledge Fabric, parallel discovery, and ML-powered analysis.
+---
+
+## What is DermaMind.ai?
+
+DermaMind.ai is an autonomous, agentic AI research platform for cancer pathology. It integrates:
+- A **Live Knowledge Graph** seeded with genes, drugs, and pathways
+- An **LLM-driven Discovery Engine** that dynamically generates and tests hypotheses
+- A **CodeAct Security Sandbox** that safely executes auto-generated Python statistics
+- A **WSI Perception Engine** (TITAN + APOLLO) for slide-level morphology features
+- An **Interactive Streamlit Dashboard** with survival plots, KM curves, and an AI research assistant
+
+Built for research scientists and clinician-scientists working with cohorts such as TCGA-BRCA and TCGA-SKCM.
 
 ---
 
@@ -16,183 +28,135 @@ An advanced agentic framework for autonomous scientific discovery in cancer path
 
 | Component | Version | Status |
 |-----------|---------|--------|
-| **DERMA-Agent** | 2.0.0 | ✅ Stable |
+| **DermaMind.ai Core** | 2.1.0 | ✅ Stable |
 | **Python** | 3.11, 3.12 | ✅ Supported |
 | **Knowledge Fabric** | 1.0.0 | ✅ Active |
-| **Discovery Engine** | 2.0.0 | ✅ Active |
-| **Pathology AI** | 1.5.0 | ✅ Active |
+| **Discovery Engine** | 2.1.0 | ✅ Active |
+| **Pathology AI (WSI)** | 1.5.0 | ✅ Active |
+| **Research Assistant** | 1.0.0 | ✅ Active |
 | **License** | MIT | ✅ Open Source |
 
 ---
 
-## 🎉 What's New in v2.0.0
+## 🎉 What's New in v2.1.0
 
-### ✨ Major Enhancements
-- 🧠 **Knowledge Fabric** - Medical knowledge graph with 50+ nodes (genes, drugs, pathways)
-- 🚀 **Fast Discovery Engine** - Parallel hypothesis testing with 10x speed improvement
-- 🤖 **ML-Powered Analysis** - Random Forest, Gradient Boosting, XGBoost integration
-- 🔬 **Advanced Pathology** - Multi-method segmentation (HSV, LAB, adaptive) + texture analysis
-- 📊 **Enhanced Dashboard** - 5-tab Streamlit interface with real-time discovery monitoring
-- 📝 **Comprehensive Documentation** - GitHub Pages website with tutorials and examples
+### ✨ New in this release
+- 🤖 **FastDiscoveryEngine → Dashboard** — LLM-generated hypotheses & CodeAct scripts now run live in the UI
+- 💬 **AI Research Assistant Chat** — In-app AI assistant for discussing findings and explanations
+- 🕸️ **Interactive PyVis Knowledge Graph** — Drag, zoom, hover, and click-explore the knowledge fabric
+- 🧹 **Clean Architecture** — All agents consolidated under `derma_agent/derma_core/agents/`
+- 🛠️ **CI Pipeline Fixed** — GitHub Actions workflows updated to reflect the correct module paths
 
-### 🔧 Improvements
-- ⚡ **Parallel Processing** - ThreadPoolExecutor for concurrent hypothesis testing
-- 💾 **Intelligent Caching** - 1-hour TTL cache for TCGA API responses
-- 🔄 **Self-Correction** - Automatic code error fixing with up to 3 iterations
-- 📈 **Expanded TCGA** - 20+ cancer cohorts supported
-- 🎨 **Better Visualization** - Kaplan-Meier, Cox regression, feature importance plots
-
-### 📦 New Components
-| Component | Description | Version |
-|-----------|-------------|---------|
-| `agents/discovery_engine.py` | Fast parallel discovery | 2.0.0 |
-| `tools/knowledge_fabric.py` | Medical knowledge graph | 1.0.0 |
-| `tools/enhanced_data_client.py` | Multi-source data access | 2.0.0 |
-| `tools/enhanced_clinical_stats.py` | ML survival analysis | 2.0.0 |
-| `tools/enhanced_pathology.py` | Advanced image AI | 1.5.0 |
-| `app_enhanced.py` | Streamlit dashboard | 2.0.0 |
-| `demo_quickstart.py` | Quick start demo | 1.0.0 |
-| `docs/` | GitHub Pages website | 1.0.0 |
+### Previous Highlights (v2.0)
+- 🧠 **Knowledge Fabric** — Medical knowledge graph with 50+ nodes
+- 🚀 **Parallel Discovery Engine** — 10x speed improvement via ThreadPoolExecutor
+- 🔬 **Advanced Pathology** — Multi-method segmentation + texture analysis
+- 📊 **Research Dashboard** — Survival curves, KM plots, and tissue correlations
 
 ---
 
-## Overview
-
-DERMA-Agent implements an intelligent "Perception-Action" loop where an AI agent autonomously:
-1. **Formulates hypotheses** using clinical open datasets (20+ TCGA cohorts) and the Knowledge Fabric
-2. **Perceives histopathology** with advanced segmentation (HSV, LAB, adaptive methods)
-3. **Validates statistically** with Kaplan-Meier, Cox regression, and ML models (Random Forest, XGBoost)
-4. **Maintains discoveries** in a Scientific Ledger with self-correction capabilities
-5. **Reasons with medical knowledge** using the Knowledge Fabric (genes, drugs, pathways)
-
-## Key Features
-
-### 🔬 Fast Discovery Engine
-- **Parallel hypothesis testing** - Test multiple hypotheses simultaneously
-- **Knowledge-guided generation** - Uses medical knowledge graph for relevant hypotheses
-- **Self-correcting execution** - Automatically fixes code errors with up to 3 iterations
-- **ML-powered analysis** - Random Forest, Gradient Boosting for prediction
-
-### 📚 Knowledge Fabric
-- **Medical knowledge graph** with 50+ nodes (genes, proteins, drugs, pathways)
-- **Graph relationships** - MUTATED_IN, TREATS, TARGETS, PART_OF, etc.
-- **Semantic search** - Find similar concepts using embeddings
-- **Path finding** - Discover connections between entities
-
-### 📊 Enhanced Data Access
-- **20+ TCGA cancer cohorts** - Skin, Breast, Lung, Brain, Colorectal, etc.
-- **Intelligent caching** - Reduces API calls with 1-hour TTL
-- **Parallel fetching** - Download multiple cohorts simultaneously
-- **Automatic preparation** - Survival-ready data formatting
-
-### 🧬 Advanced Pathology
-- **Multi-method segmentation** - HSV, LAB, and adaptive approaches
-- **Nuclei detection** - Individual nuclei counting and feature extraction
-- **Texture analysis** - GLCM and LBP features
-- **Synthetic generation** - Create test images for development
-
 ## Architecture
 
-| Component | Description | File |
-|-----------|-------------|------|
-| **Fast Discovery Engine** | Parallel hypothesis testing | `agents/discovery_engine.py` |
-| **Knowledge Fabric** | Medical knowledge graph | `tools/knowledge_fabric.py` |
-| **Enhanced Data Client** | Multi-source data with caching | `tools/enhanced_data_client.py` |
-| **Enhanced Stats Engine** | ML-powered survival analysis | `tools/enhanced_clinical_stats.py` |
-| **Enhanced Pathology** | Advanced image segmentation | `tools/enhanced_pathology.py` |
-| **Orchestrator (Legacy)** | Original LangGraph workflow | `agents/orchestrator.py` |
-| **Enhanced Dashboard** | Streamlit visualization | `app_enhanced.py` |
+```
+DermaMind.ai
+├── derma_agent/
+│   ├── app.py                          # Streamlit entrypoint
+│   ├── derma_core/
+│   │   ├── agents/
+│   │   │   ├── discovery_engine.py     # LLM hypothesis + CodeAct generation
+│   │   │   ├── orchestrator.py         # LangGraph workflow orchestrator
+│   │   │   └── research_assistant.py  # In-app AI chat assistant
+│   │   ├── actions/
+│   │   │   ├── code_executor.py        # Restricted CodeAct sandbox
+│   │   │   ├── critic_agent.py         # AST security audit
+│   │   │   └── safety_policy.py        # Malicious probe detection
+│   │   ├── knowledge_fabric/
+│   │   │   └── graph_memory.py         # Live knowledge graph
+│   │   ├── memory/
+│   │   │   └── research_log.py         # Episodic research narrative
+│   │   └── perception/
+│   │       └── wsi_engine.py           # WSI slide ingestion (TITAN/APOLLO)
+│   ├── web_interface/
+│   │   ├── dashboard.py                # Main dashboard render logic
+│   │   └── components.py              # Reusable UI components
+│   └── requirements.txt
+├── tools/                              # Legacy: data & clinical stats engines
+├── tests/
+└── docs/                              # GitHub Pages site (dermamind.ai)
+```
+
+---
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/DERMA-Agent.git
+git clone https://github.com/sgmoorthy/DERMA-Agent.git
 cd DERMA-Agent
 
-# Create a virtual environment (recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate       # Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Optional: Download large models for better pathology analysis
-# pip install opencv-python-headless cellpose
-```
-
-## Configuration
-
-### API Keys
-Set your OpenAI API key for full LLM capabilities:
-```bash
+# Set your API key (enables live LLM hypothesis generation)
 export OPENAI_API_KEY="your_api_key_here"
-# On Windows: set OPENAI_API_KEY=your_api_key_here
+# Windows: set OPENAI_API_KEY=your_api_key_here
 ```
 
-### Optional: Anthropic or Google
+> **No API key?** DermaMind.ai gracefully falls back to a built-in mock generator so you can explore the full UI without any API costs.
+
+---
+
+## Launching the Dashboard
+
+```bash
+# Run the DermaMind.ai Streamlit dashboard
+streamlit run derma_agent/app.py --server.port 8507
+```
+
+Then open **http://localhost:8507** in your browser.
+
+---
+
+## Using the Discovery Loop
+
+1. Select a **Target Cohort** (e.g. TCGA-SKCM) in the sidebar.
+2. Enter a **Slide ID** for WSI perception.
+3. Click **🚀 Run Generative Discovery Loop**.
+
+The agent will:
+- **Phase 1** — Ingest the slide and run TITAN + APOLLO feature extraction.
+- **Phase 2** — Consult the Knowledge Fabric and generate a hypothesis via LLM.
+- **Phase 3** — Auto-generate CodeAct Python, submit to AST security critic.
+- **Phase 4** — Execute in the restricted sandbox and extract survival statistics.
+- **Results** — Render Kaplan-Meier curves, cellularity scatter, APOLLO embedding, and save to the narrative log.
+
+---
+
+## Programmatic API
+
 ```python
-# In agents/discovery_engine.py, modify _init_llm()
-from langchain_anthropic import ChatAnthropic
-llm = ChatAnthropic(model="claude-3-opus-20240229")
-```
+from derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
+from derma_agent.derma_core.knowledge_fabric.graph_memory import KnowledgeFabric
 
-## Usage
+# Build a knowledge fabric
+kg = KnowledgeFabric()
 
-### 1. Quick Start - Run Discovery
-```bash
-# Run fast discovery on a single cancer type
-python -c "from agents.discovery_engine import run_fast_discovery; run_fast_discovery(['Breast Cancer'])"
-
-# Or use the enhanced CLI
-python -m agents.discovery_engine --cancer breast --workers 4
-```
-
-### 2. Launch Enhanced Dashboard
-```bash
-# Enhanced Streamlit app with all features
-streamlit run app_enhanced.py
-
-# Or use the original simple dashboard
-streamlit run app.py
-```
-
-### 3. Interactive Jupyter Notebook
-```bash
-# Comprehensive demo with all features
-jupyter notebook notebooks/comprehensive_demo.ipynb
-
-# Original simple demo
-jupyter notebook notebooks/demo_discovery.ipynb
-```
-
-### 4. Programmatic API
-```python
-from agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
-from tools.knowledge_fabric import create_default_knowledge_fabric
-
-# Create knowledge fabric
-kg = create_default_knowledge_fabric("data/knowledge_fabric.json")
-
-# Configure discovery
-config = DiscoveryConfig(
-    parallel_workers=4,
-    hypothesis_per_cohort=5,
-    use_knowledge_fabric=True
-)
-
-# Run discovery
-engine = FastDiscoveryEngine(config, kg)
+# Configure and run discovery
+config = DiscoveryConfig(parallel_workers=4, hypothesis_per_cohort=3, use_knowledge_fabric=True)
+engine = FastDiscoveryEngine(config, knowledge_fabric=kg)
 results = engine.discover_single_cohort("TCGA-BRCA", "Breast Cancer")
 
-# Get significant findings
 significant = engine.get_significant_findings()
 print(f"Found {len(significant)} significant discoveries!")
 ```
 
-## Supported Cancer Types
+---
 
-The framework supports 20+ TCGA cancer cohorts:
+## Supported Cancer Cohorts
 
 | Cancer Type | TCGA Code | Cancer Type | TCGA Code |
 |-------------|-----------|-------------|-----------|
@@ -202,33 +166,10 @@ The framework supports 20+ TCGA cancer cohorts:
 | Colorectal | TCGA-COAD | Ovarian | TCGA-OV |
 | Prostate | TCGA-PRAD | Bladder | TCGA-BLCA |
 | Kidney (Clear Cell) | TCGA-KIRC | Kidney (Papillary) | TCGA-KIRP |
-| Stomach | TCGA-STAD | Head and Neck | TCGA-HNSC |
+| Stomach | TCGA-STAD | Head & Neck | TCGA-HNSC |
 | Liver | TCGA-LIHC | Pancreatic | TCGA-PAAD |
 
-## Discovery Workflow
-
-```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Data Access    │────▶│  Hypothesis Gen  │────▶│  Parallel Test  │
-│  (TCGA/GDC)     │     │  (LLM + Knowledge)│     │  (Survival/ML)  │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-                                                          │
-        ┌───────────────────────────────────────────────────┘
-        ▼
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Results Save   │◀────│  Auto-Correction  │◀────│  Significance   │
-│  (JSON Ledger)  │     │  (Error Recovery) │     │  Test (p<0.05)  │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-```
-
-## Output Files
-
-All discoveries are saved to the `discoveries/` directory:
-
-- `discovery_ledger_*.json` - Detailed results for each hypothesis
-- `discovery_report_*.json` - Summary statistics
-- `knowledge_fabric.json` - Medical knowledge graph
-- `dashboard.png` - Visual summary (when run from notebook)
+---
 
 ## Knowledge Fabric Schema
 
@@ -242,49 +183,46 @@ Node Types:          Relationships:
 └── Clinical_Feature └── ASSOCIATED_WITH (Gene → Clinical_Feature)
 ```
 
-## Safety & Disclaimer
+---
 
-⚠️ **Important**: The CodeAct environment (`tools/clinical_stats.py`) uses `exec()` to run dynamically generated code. While the environment is restricted to statistical libraries only, be aware that:
+## Safety & Security
 
-- Code executes locally on your machine
-- Only use with trusted data sources
-- Review generated code in production environments
-- Consider sandboxing for multi-user deployments
-
-## Performance Tips
-
-1. **Enable caching** - First API calls are cached for 1 hour
-2. **Use parallel workers** - Set `parallel_workers=4` for 4x speedup
-3. **Limit hypotheses** - Start with 2-3 per cohort for faster iteration
-4. **Pre-build knowledge fabric** - Run once, reuse across sessions
-5. **Use mock mode** - Set `OPENAI_API_KEY=""` for testing without API costs
-
-## Citation
-
-If you use DERMA-Agent in your research, please cite:
-
-```bibtex
-@software{derma_agent_2024,
-  title = {DERMA-Agent: Autonomous Cancer Pathology Discovery Framework},
-  author = {Your Name},
-  year = {2024},
-  url = {https://github.com/yourusername/DERMA-Agent}
-}
-```
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Contributing
-
-Contributions welcome! Areas of interest:
-- Additional cancer cohorts
-- New ML models for survival prediction
-- Enhanced segmentation methods
-- Knowledge graph expansion
-- UI/UX improvements
+DermaMind.ai uses a multi-layer code execution sandbox:
+- All auto-generated Python is validated with **AST parsing** before execution.
+- The **CriticAgent** checks for unsafe imports (e.g. `os`, `subprocess`, `socket`).
+- Execution is restricted to approved statistical libraries only.
+- Malicious probes are blocked with a `BLOCKED — Security Violation` response.
 
 ---
 
-**DERMA-Agent** | Powered by LangGraph, OpenAI, TCGA, and Open Source
+## Citation
+
+If you use DermaMind.ai in your research, please cite:
+
+```bibtex
+@software{dermamind_ai_2025,
+  title  = {DermaMind.ai: Autonomous AI for Cancer Pathology Discovery},
+  author = {Moorthy, S.},
+  year   = {2025},
+  url    = {https://github.com/sgmoorthy/DERMA-Agent}
+}
+```
+
+---
+
+## License
+
+MIT License — See [LICENSE](LICENSE) for details.
+
+## Contributing
+
+Contributions are welcome! Areas of interest:
+- Additional TCGA/GDC cohort support
+- New ML models for survival prediction
+- Enhanced WSI segmentation methods
+- Knowledge graph expansion (new genes, drugs, pathways)
+- UI/UX improvements to the dashboard
+
+---
+
+**DermaMind.ai** · Powered by LangGraph · OpenAI · TCGA/GDC · Lifelines · Streamlit

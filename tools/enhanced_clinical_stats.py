@@ -1,5 +1,5 @@
 """
-Enhanced Clinical Statistics Engine for DERMA-Agent
+Enhanced Clinical Statistics Engine for DermaMind.ai
 Provides advanced survival analysis, ML models, and statistical testing capabilities.
 """
 

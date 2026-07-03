@@ -1,9 +1,9 @@
-# DERMA-Agent — Research-Grade Enhancement Progress Snapshot
+# DermaMind.ai — Research-Grade Enhancement Progress Snapshot
 
 > **Saved**: 2026-07-03
 > **Last conversation ID**: `f290f06e-523a-4bc0-bb24-80d05c19261d`
-> **Project Root**: `d:\projects\DERMA-Agent`
-> **GitHub**: https://github.com/sgmoorthy/DERMA-Agent
+> **Project Root**: `d:\projects\DermaMind.ai`
+> **GitHub**: https://github.com/sgmoorthy/DermaMind.ai
 
 ---
 
@@ -27,7 +27,7 @@
 
 ## Goal
 
-Transform DERMA-Agent from an interactive exploration tool into a research-grade cancer discovery platform with:
+Transform DermaMind.ai from an interactive exploration tool into a research-grade cancer discovery platform with:
 - Reproducibility: YAML configs, deterministic random seeds, versioned output ledger
 - Safety: AST code validation, structured Analysis DSL bypassing exec()
 - Data integrity: Provenance tracking, GDC API version logging, missing data handling

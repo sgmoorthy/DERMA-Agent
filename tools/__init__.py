@@ -1,5 +1,5 @@
 """
-DERMA-Agent Tools Package
+DermaMind.ai Tools Package
 =========================
 
 This package contains tools for:
@@ -51,7 +51,7 @@ except ImportError:
     pass
 
 __version__ = "2.0.0"
-__author__ = "DERMA-Agent Team"
+__author__ = "DermaMind.ai Team"
 
 __all__ = [
     # Knowledge Fabric

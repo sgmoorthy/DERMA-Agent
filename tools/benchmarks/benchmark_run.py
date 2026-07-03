@@ -1,5 +1,5 @@
 """
-DERMA-Agent Benchmarking Script
+DermaMind.ai Benchmarking Script
 Measures execution time and memory usage for each phase of the discovery pipeline.
 Outputs a structured JSON report to data/benchmark_results_<timestamp>.json.
 
@@ -63,7 +63,7 @@ def run_benchmark(cohort_id: str = "TCGA-SKCM",
       8. KG confidence scoring
     """
     print(f"\n{'='*60}")
-    print(f"  DERMA-Agent Benchmark  |  cohort={cohort_id}  seed={random_seed}")
+    print(f"  DermaMind.ai Benchmark  |  cohort={cohort_id}  seed={random_seed}")
     print(f"{'='*60}\n")
 
     phases = []
@@ -280,7 +280,7 @@ def run_benchmark(cohort_id: str = "TCGA-SKCM",
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run DERMA-Agent pipeline benchmark")
+    parser = argparse.ArgumentParser(description="Run DermaMind.ai pipeline benchmark")
     parser.add_argument("--cohort", type=str, default="TCGA-SKCM", help="TCGA cohort project ID")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--n_hypotheses", type=int, default=2, help="Hypotheses per cohort (reserved for future use)")

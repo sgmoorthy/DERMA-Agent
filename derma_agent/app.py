@@ -11,14 +11,33 @@ from web_interface.dashboard import render_dashboard
 
 # App page configurations
 st.set_page_config(
-    page_title="DERMA-Agent AILAB",
-    page_icon="🔬",
+    page_title="DermaMind.ai — Autonomous AI for Cancer Pathology Discovery",
+    page_icon="🧬",
     layout="wide"
 )
 
-st.title("🔬 DERMA-Agent AILAB")
-st.markdown("##### Scaffolding Autonomous Cancer Pathology Discovery Engine")
+# ── Header ────────────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+  .dermamind-header { padding: 0.5rem 0 0.25rem 0; }
+  .dermamind-title  { font-size: 2.1rem; font-weight: 800; letter-spacing: -0.5px;
+                      background: linear-gradient(135deg, #4cc9f0 0%, #7c3aed 100%);
+                      -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .dermamind-sub    { font-size: 0.95rem; color: #aab4c4; margin-top: 0.15rem; }
+</style>
+<div class="dermamind-header">
+  <div class="dermamind-title">🧬 DermaMind.ai</div>
+  <div style="font-size:1rem;font-weight:600;color:#e0e0e0;margin-top:2px;">
+    Autonomous AI for Cancer Pathology Discovery
+  </div>
+  <div class="dermamind-sub">
+    From slides to survival insights: graph-powered AI that tests hypotheses,
+    validates biomarkers, and accelerates oncology research.
+  </div>
+</div>
+""", unsafe_allow_html=True)
 st.markdown("---")
+
 
 # Initialize session state for Graph Fabric
 if 'fabric' not in st.session_state:

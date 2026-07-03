@@ -1,12 +1,12 @@
-# GitHub Release Notes - DERMA-Agent v2.0.0
+# GitHub Release Notes - DermaMind.ai v2.0.0
 
 **Release Date:** May 10, 2026  
-**Repository:** https://github.com/sgmoorthy/DERMA-Agent  
+**Repository:** https://github.com/sgmoorthy/DermaMind.ai  
 **Commit:** 614f4c6
 
 ## 🚀 What's New in v2.0.0
 
-This is a major enhancement release that transforms DERMA-Agent from a simple MVP into a comprehensive cancer pathology discovery framework.
+This is a major enhancement release that transforms DermaMind.ai from a simple MVP into a comprehensive cancer pathology discovery framework.
 
 ### ✨ New Features
 
@@ -49,8 +49,8 @@ This is a major enhancement release that transforms DERMA-Agent from a simple MV
 ### 📦 Installation
 
 ```bash
-git clone https://github.com/sgmoorthy/DERMA-Agent.git
-cd DERMA-Agent
+git clone https://github.com/sgmoorthy/DermaMind.ai.git
+cd DermaMind.ai
 pip install -r requirements.txt
 ```
 
@@ -70,7 +70,7 @@ python -c "from agents.discovery_engine import run_fast_discovery; run_fast_disc
 ### 📚 Documentation
 
 - **README.md** - Full usage guide
-- **DERMA_AGENT_STATUS.md** - Project status
+- **DERMAMIND_STATUS.md** - Project status
 - **CONTRIBUTING.md** - Contribution guidelines
 - **CHANGELOG.md** - Version history
 - **LICENSE** - MIT License
@@ -91,9 +91,9 @@ python -c "from agents.discovery_engine import run_fast_discovery; run_fast_disc
 
 ### 🔗 Links
 
-- **Repository:** https://github.com/sgmoorthy/DERMA-Agent
-- **Issues:** https://github.com/sgmoorthy/DERMA-Agent/issues
-- **Pull Requests:** https://github.com/sgmoorthy/DERMA-Agent/pulls
+- **Repository:** https://github.com/sgmoorthy/DermaMind.ai
+- **Issues:** https://github.com/sgmoorthy/DermaMind.ai/issues
+- **Pull Requests:** https://github.com/sgmoorthy/DermaMind.ai/pulls
 
 ### 🙏 Acknowledgments
 

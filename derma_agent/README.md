@@ -1,6 +1,6 @@
-# 🔬 DERMA-Agent AILAB Scaffold
+# 🔬 DermaMind.ai AILAB Scaffold
 
-This is the modular, professional-grade scaffolding for the `DERMA-Agent` framework designed for computational pathology generative discovery.
+This is the modular, professional-grade scaffolding for the `DermaMind.ai` framework designed for computational pathology generative discovery.
 
 ## Directory Structure
 

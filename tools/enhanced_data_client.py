@@ -1,5 +1,5 @@
 """
-Enhanced Data Client for DERMA-Agent
+Enhanced Data Client for DermaMind.ai
 Integrates multiple open clinical data sources with caching and parallel fetching.
 Supports TCGA (GDC), cBioPortal, and other public cancer genomics datasets.
 """

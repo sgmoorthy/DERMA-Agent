@@ -398,7 +398,11 @@ def render_dashboard():
 
     # ── Sidebar ──────────────────────────────────────────────────────────────
     with st.sidebar:
+        st.markdown("### 🧬 DermaMind.ai")
+        st.caption("Autonomous AI for Cancer Pathology Discovery")
+        st.divider()
         st.header("🔬 Discovery Controls")
+
         cohort   = st.selectbox("Select Target Cohort",
                                 ["TCGA-SKCM", "TCGA-BRCA", "TCGA-LUAD", "TCGA-COAD", "TCGA-GBM"])
         slide_id = st.text_input("Enter Slide ID Target", "WSI-TCGA-SKCM-009A")

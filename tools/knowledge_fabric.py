@@ -1,5 +1,5 @@
 """
-Knowledge Fabric: Medical Knowledge Graph for DERMA-Agent
+Knowledge Fabric: Medical Knowledge Graph for DermaMind.ai
 A Neo4j-style graph database implementation for storing and reasoning over
 medical knowledge, cancer pathways, drug interactions, and clinical relationships.
 """

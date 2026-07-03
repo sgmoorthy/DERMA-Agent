@@ -1,6 +1,6 @@
-# Contributing to DERMA-Agent
+# Contributing to DermaMind.ai
 
-Thank you for your interest in contributing to DERMA-Agent! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to DermaMind.ai! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -54,8 +54,8 @@ Enhancement suggestions are welcome! Please:
 
 ```bash
 # Clone your fork
-git clone https://github.com/your-username/DERMA-Agent.git
-cd DERMA-Agent
+git clone https://github.com/your-username/DermaMind.ai.git
+cd DermaMind.ai
 
 # Create virtual environment
 python -m venv venv
@@ -77,7 +77,7 @@ flake8 .
 ## Project Structure
 
 ```
-DERMA-Agent/
+DermaMind.ai/
 ├── agents/           # Agent implementations
 ├── tools/            # Tools and utilities
 ├── notebooks/        # Jupyter notebooks
@@ -123,7 +123,7 @@ def analyze_survival(df: pd.DataFrame, time_col: str = 'time') -> SurvivalResult
 - Update README.md for major features
 - Add docstrings to all public APIs
 - Comment complex logic
-- Keep DERMA_AGENT_STATUS.md updated
+- Keep DERMAMIND_STATUS.md updated
 
 ## Testing
 
@@ -211,4 +211,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-Thank you for contributing to DERMA-Agent! 🚀
+Thank you for contributing to DermaMind.ai! 🚀
