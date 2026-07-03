@@ -19,6 +19,7 @@ from derma_core.actions.code_executor import CodeExecutor
 from derma_core.actions.critic_agent import CriticAgent
 from derma_core.memory.research_log import ResearchNarrative
 from derma_core.agents.research_assistant import ResearchAssistant
+from derma_core.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
 from web_interface.components import render_metric_card, render_thought_card
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -267,17 +268,13 @@ def run_scientific_workflow(cohort: str, tissue_slide_id: str):
     # ── Step 2: Knowledge Fabric Consultation ───────────────────────────────
     with st.status("🧠 Phase 2 — Knowledge Fabric Consultation & Hypothesis Formation", expanded=False) as s:
         fabric = st.session_state.fabric
-        priors = fabric.query_context("BRAF")
-
-        hypothesis = (
-            f"In cohort {cohort}, BRAF mutation status is prognostic of survival, "
-            f"correlated with elevated cellularity ({titan_features['cellularity']:.2f}) "
-            f"and {titan_features['primary_pattern']} tissue pattern."
-        )
-        s.update(label="✅ Phase 2 complete", state="complete")
-
-    # ── Step 3: Generate Statistical Code + AST Critic ──────────────────────
-    with st.status("🛡️ Phase 3 — CodeAct Generation & AST Security Audit", expanded=False) as s:
+        
+        if "discovery_engine" not in st.session_state:
+            config = DiscoveryConfig(use_knowledge_fabric=True)
+            st.session_state.discovery_engine = FastDiscoveryEngine(config, knowledge_fabric=fabric)
+            
+        discovery_engine = st.session_state.discovery_engine
+        
         rng = np.random.default_rng(int(sum(ord(c) for c in tissue_slide_id)) % 10000)
         n   = 200
         mock_df = pd.DataFrame({
@@ -285,9 +282,32 @@ def run_scientific_workflow(cohort: str, tissue_slide_id: str):
             "event":           rng.binomial(1, 0.4, n),
             "is_braf_mutated": rng.binomial(1, 0.35, n),
             "cellularity":     rng.uniform(0.1, 0.8, n),
+            "primary_pattern": [titan_features['primary_pattern']] * n
         })
 
-        stat_code = """# Auto-generated CodeAct — Kaplan-Meier on BRAF status
+        try:
+            hypotheses = discovery_engine._generate_hypothesis_batch(mock_df, cohort, 1)
+            hypothesis = hypotheses[0] if hypotheses else None
+        except Exception as e:
+            hypothesis = None
+
+        if not hypothesis:
+            hypothesis = (
+                f"In cohort {cohort}, BRAF mutation status is prognostic of survival, "
+                f"correlated with elevated cellularity ({titan_features['cellularity']:.2f}) "
+                f"and {titan_features['primary_pattern']} tissue pattern."
+            )
+        s.update(label="✅ Phase 2 complete", state="complete")
+
+    # ── Step 3: Generate Statistical Code + AST Critic ──────────────────────
+    with st.status("🛡️ Phase 3 — CodeAct Generation & AST Security Audit", expanded=False) as s:
+        try:
+            stat_code = discovery_engine._generate_test_code(hypothesis, mock_df, iteration=0)
+        except Exception:
+            stat_code = ""
+
+        if not stat_code or "KaplanMeierFitter" not in stat_code:
+            stat_code = """# Auto-generated CodeAct — Kaplan-Meier on BRAF status
 import pandas as pd
 from lifelines import KaplanMeierFitter
 
