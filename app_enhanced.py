@@ -27,7 +27,7 @@ try:
         create_synthetic_pathology_image, NucleiSegmenter, 
         TissueAnalyzer, EnhancedWSIProcessor
     )
-    from agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
+    from derma_agent.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
     ENHANCED_MODE = True
 except ImportError as e:
     st.error(f"Failed to load enhanced modules: {e}")
@@ -220,31 +220,86 @@ def render_discovery_tab():
     ledger, ledger_file = load_latest_discovery()
     report = load_latest_report()
     
-    if not ledger:
-        st.info("No discovery results found. Run a discovery first!")
+    # 1. Run New Discovery Panel
+    st.subheader("🚀 Run New Discovery Engine")
+    with st.expander("Launch Discovery Run", expanded=(not ledger)):
+        recipe = st.selectbox(
+            "Select Guided Research Recipe",
+            ["Custom Settings", 
+             "Prognostic Biomarkers in Skin Melanoma (SKCM)", 
+             "Breast Cancer Drug Response & Mutations (BRCA)", 
+             "Pan-Cancer Mutation Landscape"]
+        )
         
-        # Quick discovery button
-        if ENHANCED_MODE and st.button("🚀 Run Quick Discovery"):
-            with st.spinner("Running discovery..."):
-                try:
-                    config = DiscoveryConfig(
-                        parallel_workers=2,
-                        hypothesis_per_cohort=2,
-                        use_knowledge_fabric=True
-                    )
-                    from agents.discovery_engine import run_fast_discovery
-                    report = run_fast_discovery(
-                        cancer_types=["Breast Cancer"],
-                        config=config,
-                        output_dir="discoveries"
-                    )
-                    st.success("Discovery complete!")
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Discovery failed: {e}")
+        # Determine defaults based on recipe selection
+        default_workers = 2
+        default_hyp = 3
+        default_p = 0.05
+        default_kf = True
+        default_cohorts = ["Skin Cancer"]
+        
+        if recipe == "Prognostic Biomarkers in Skin Melanoma (SKCM)":
+            default_workers = 2
+            default_hyp = 3
+            default_cohorts = ["Skin Cancer"]
+            st.info("Recipe selected: Evaluates prognostic impact of gene mutations, stage, and pathology in Melanoma.")
+        elif recipe == "Breast Cancer Drug Response & Mutations (BRCA)":
+            default_workers = 3
+            default_hyp = 4
+            default_cohorts = ["Breast Cancer"]
+            st.info("Recipe selected: Assesses mutation patterns, clinical features, and pathway interactions in Breast Cancer.")
+        elif recipe == "Pan-Cancer Mutation Landscape":
+            default_workers = 4
+            default_hyp = 3
+            default_cohorts = ["Skin Cancer", "Breast Cancer"]
+            st.info("Recipe selected: Scans multiple cohorts to find common gene-survival linkages across cancer types.")
+            
+        col1, col2 = st.columns(2)
+        with col1:
+            workers = st.slider("Parallel Workers", 1, 8, default_workers)
+            hyp_per_cohort = st.slider("Hypotheses per Cohort", 1, 10, default_hyp)
+            sig_thresh = st.slider("Significance Threshold (p-value)", 0.01, 0.1, default_p, step=0.01)
+        with col2:
+            use_kf = st.checkbox("Use Knowledge Fabric", value=default_kf)
+            # Available cohort names in EXPANDED_CANCER_PROJECTS
+            cohort_names = list(EXPANDED_CANCER_PROJECTS.keys())
+            selected_cohorts = st.multiselect("Select Cohorts", cohort_names, 
+                                              default=[c for c in cohort_names if c in default_cohorts])
+            
+        if st.button("🚀 Execute Discovery Run"):
+            if not selected_cohorts:
+                st.error("Please select at least one cohort.")
+            else:
+                with st.spinner("Executing discovery engine. Running stats, ast-checking, and generating reports..."):
+                    try:
+                        # Translate cohort names to project IDs
+                        project_ids = [EXPANDED_CANCER_PROJECTS[name] for name in selected_cohorts]
+                        
+                        config = DiscoveryConfig(
+                            parallel_workers=workers,
+                            hypothesis_per_cohort=hyp_per_cohort,
+                            significance_threshold=sig_thresh,
+                            use_knowledge_fabric=use_kf
+                        )
+                        # Map back to names for run_fast_discovery
+                        cohort_names_mapped = [name.replace(" Cancer", "").replace(" Carcinoma", "") for name in selected_cohorts]
+                        
+                        from agents.discovery_engine import run_fast_discovery
+                        report = run_fast_discovery(
+                            cancer_types=cohort_names_mapped,
+                            config=config,
+                            output_dir="discoveries"
+                        )
+                        st.success("Discovery completed successfully!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Discovery execution failed: {e}")
+                        
+    if not ledger:
+        st.info("No discovery results found. Run a discovery using the generator above!")
         return
     
-    # Show summary metrics
+    # 2. Show Summary Metrics
     if report:
         st.subheader("Discovery Summary")
         col1, col2, col3, col4 = st.columns(4)
@@ -258,50 +313,186 @@ def render_discovery_tab():
         with col4:
             exec_time = report.get('execution_time_seconds', 0)
             st.metric("Execution Time", f"{exec_time:.1f}s")
+            
+    # 3. Export Scientific Results
+    st.subheader("📤 Export Scientific Results")
+    col_exp1, col_exp2 = st.columns(2)
+    with col_exp1:
+        # Convert ledger to CSV
+        ledger_df = pd.DataFrame(ledger)
+        csv = ledger_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Export Findings Ledger to CSV",
+            data=csv,
+            file_name=f"derma_agent_findings_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+    with col_exp2:
+        # Generate Markdown report
+        report_md = f"""# DERMA-Agent Clinical Discovery Report
+Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Schema Version: {report.get('schema_version', '1.0') if report else '1.0'}
+
+## Executive Summary
+- **Total Hypotheses Tested:** {report.get('total_hypotheses_tested', 0) if report else len(ledger)}
+- **Significant Findings (p <= {report.get('config', {}).get('significance_threshold', 0.05) if report else 0.05}):** {report.get('significant_findings', 0) if report else sum(1 for e in ledger if e.get('significant'))}
+- **Discovery Rate:** {report.get('significance_rate', 0) * 100:.1f}%
+- **Total Execution Time:** {report.get('execution_time_seconds', 0.0):.2f} seconds
+
+## Detailed Discoveries Table
+| Project ID | Hypothesis | P-Value | Hazard Ratio | Significant |
+|------------|------------|---------|--------------|-------------|
+"""
+        for entry in ledger:
+            p_val_str = f"{entry.get('p_value'):.4f}" if entry.get('p_value') is not None else "N/A"
+            hr_str = f"{entry.get('hazard_ratio'):.2f}" if entry.get('hazard_ratio') is not None else "N/A"
+            sig_str = "Yes" if entry.get('significant') else "No"
+            report_md += f"| {entry.get('project_id')} | {entry.get('hypothesis')} | {p_val_str} | {hr_str} | {sig_str} |\n"
+            
+        report_md += "\n## Individual Hypotheses & Conclusions\n"
+        for idx, entry in enumerate(ledger):
+            report_md += f"### {idx+1}. {entry.get('hypothesis')}\n"
+            report_md += f"- **Cohort:** {entry.get('project_id')}\n"
+            report_md += f"- **P-Value:** {entry.get('p_value')}\n"
+            if entry.get('hazard_ratio'):
+                report_md += f"- **Hazard Ratio:** {entry.get('hazard_ratio'):.2f}\n"
+            report_md += f"- **Conclusion:** {entry.get('conclusion')}\n"
+            if entry.get('test_code'):
+                report_md += f"\n**Statistical Code Run:**\n```python\n{entry.get('test_code')}\n```\n"
+            report_md += "\n---\n"
+            
+        st.download_button(
+            label="📥 Export Scientific Report to Markdown",
+            data=report_md.encode('utf-8'),
+            file_name=f"derma_agent_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
+            mime="text/markdown",
+            use_container_width=True
+        )
     
-    # Visualizations
+    # 4. Visualizations & Analytics
     st.subheader("Discovery Analytics")
-    
     col1, col2 = st.columns(2)
     
     with col1:
-        # P-value distribution
         p_values = [e.get('p_value') for e in ledger if e.get('p_value') is not None]
         if p_values:
-            fig, ax = plt.subplots()
-            ax.hist(p_values, bins=20, edgecolor='black', alpha=0.7, color='steelblue')
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.hist(p_values, bins=15, edgecolor='black', alpha=0.7, color='steelblue')
             ax.axvline(x=0.05, color='red', linestyle='--', label='p=0.05')
             ax.set_xlabel('P-value')
             ax.set_ylabel('Count')
             ax.set_title('P-value Distribution')
             ax.legend()
             st.pyplot(fig)
-    
-    with col2:
-        # By cohort
-        cohort_stats = {}
-        for entry in ledger:
-            pid = entry.get('project_id', 'unknown')
-            if pid not in cohort_stats:
-                cohort_stats[pid] = {'total': 0, 'significant': 0}
-            cohort_stats[pid]['total'] += 1
-            if entry.get('significant'):
-                cohort_stats[pid]['significant'] += 1
-        
-        if cohort_stats:
-            cohort_df = pd.DataFrame([
-                {'Cohort': k, 'Total': v['total'], 'Significant': v['significant']}
-                for k, v in cohort_stats.items()
-            ])
             
-            fig = px.bar(cohort_df, x='Cohort', y=['Total', 'Significant'],
-                        title='Discoveries by Cohort', barmode='group')
+    with col2:
+        # Forest plot of Hazard Ratios
+        hr_entries = [e for e in ledger if e.get('hazard_ratio') is not None]
+        if hr_entries:
+            hr_df = pd.DataFrame([
+                {
+                    "Hypothesis": e.get('hypothesis')[:50] + "...",
+                    "Hazard Ratio": e.get('hazard_ratio'),
+                    "Significant": "Significant" if e.get('significant') else "Not Significant"
+                }
+                for e in hr_entries
+            ])
+            fig = px.scatter(hr_df, x="Hazard Ratio", y="Hypothesis", color="Significant",
+                             title="Hazard Ratios of Discoveries",
+                             symbol="Significant")
+            fig.add_vline(x=1.0, line_dash="dash", line_color="red")
             st.plotly_chart(fig, use_container_width=True)
-    
-    # Detailed findings
+        else:
+            cohort_stats = {}
+            for entry in ledger:
+                pid = entry.get('project_id', 'unknown')
+                if pid not in cohort_stats:
+                    cohort_stats[pid] = {'total': 0, 'significant': 0}
+                cohort_stats[pid]['total'] += 1
+                if entry.get('significant'):
+                    cohort_stats[pid]['significant'] += 1
+            if cohort_stats:
+                cohort_df = pd.DataFrame([
+                    {'Cohort': k, 'Total': v['total'], 'Significant': v['significant']}
+                    for k, v in cohort_stats.items()
+                ])
+                fig = px.bar(cohort_df, x='Cohort', y=['Total', 'Significant'],
+                            title='Discoveries by Cohort', barmode='group')
+                st.plotly_chart(fig, use_container_width=True)
+
+    # 5. Interactive Kaplan-Meier Plotter (Interpretability Panel)
+    st.subheader("📈 Interactive Kaplan-Meier Plotter")
+    with st.expander("Generate Kaplan-Meier Curves from Cohort Data", expanded=False):
+        cohort_list = list(set([entry.get('project_id') for entry in ledger if entry.get('project_id')]))
+        if not cohort_list:
+            cohort_list = ["TCGA-SKCM", "TCGA-BRCA"]
+        
+        sel_cohort = st.selectbox("Select Cohort to Plot", cohort_list)
+        
+        if st.button("📥 Load Cohort Data for Plotting"):
+            with st.spinner("Fetching and prepping data..."):
+                try:
+                    data_client = get_data_client()
+                    df_clin = data_client.get_survival_analysis_ready_data(sel_cohort)
+                    
+                    if not df_clin.empty:
+                        # Try to load pathology if it exists
+                        pathology_csv = f"data/pathology_{sel_cohort.lower()}_features.csv"
+                        if os.path.exists(pathology_csv):
+                            df_clin = data_client.merge_pathology_features(df_clin, pathology_csv)
+                            
+                        # Show column selector
+                        cols_to_plot = [c for c in df_clin.columns if df_clin[c].nunique() > 1 and df_clin[c].nunique() < 10]
+                        cont_cols = [c for c in df_clin.select_dtypes(include=[np.number]).columns 
+                                     if c not in ['time', 'event', 'days_to_death', 'days_to_last_follow_up', 'age_at_diagnosis']]
+                        
+                        st.session_state['plot_df'] = df_clin
+                        st.session_state['cols_to_plot'] = cols_to_plot
+                        st.session_state['cont_cols'] = cont_cols
+                        st.success(f"Loaded {len(df_clin)} samples for {sel_cohort}")
+                    else:
+                        st.warning("No data found for the selected cohort.")
+                except Exception as e:
+                    st.error(f"Error loading plot data: {e}")
+                    
+        if 'plot_df' in st.session_state and 'cols_to_plot' in st.session_state:
+            df_plot = st.session_state['plot_df']
+            cols = st.session_state['cols_to_plot']
+            conts = st.session_state['cont_cols']
+            
+            plot_col = st.selectbox("Select Stratification Variable", cols + [f"{c} (Split by Median)" for c in conts])
+            
+            if st.button("Plot Kaplan-Meier Curve"):
+                from lifelines import KaplanMeierFitter
+                
+                fig, ax = plt.subplots(figsize=(8, 5))
+                kmf = KaplanMeierFitter()
+                
+                if "Split by Median" in plot_col:
+                    base_col = plot_col.replace(" (Split by Median)", "")
+                    median_val = df_plot[base_col].median()
+                    df_plot['temp_group'] = df_plot[base_col].apply(lambda x: f"High (>= {median_val:.2f})" if x >= median_val else f"Low (< {median_val:.2f})")
+                    group_col = 'temp_group'
+                else:
+                    group_col = plot_col
+                    
+                groups = df_plot[group_col].dropna().unique()
+                
+                for g in groups:
+                    mask = df_plot[group_col] == g
+                    if mask.sum() >= 3:
+                        kmf.fit(df_plot.loc[mask, 'time'], df_plot.loc[mask, 'event'], label=str(g))
+                        kmf.plot_survival_function(ax=ax, ci_show=False)
+                
+                ax.set_title(f'Kaplan-Meier Survival Curves by {plot_col} (Cohort: {sel_cohort})')
+                ax.set_xlabel('Survival Time (Days)')
+                ax.set_ylabel('Survival Probability')
+                ax.grid(True, alpha=0.3)
+                st.pyplot(fig)
+
+    # 6. Detailed Findings list
     st.subheader("Detailed Findings")
-    
-    # Filter options
     show_only_significant = st.checkbox("Show only significant findings", value=False)
     
     for entry in ledger:
@@ -316,7 +507,7 @@ def render_discovery_tab():
             
             col1, col2 = st.columns([3, 1])
             with col1:
-                st.markdown(f"**{entry.get('hypothesis', 'Unknown')[:100]}...**")
+                st.markdown(f"**{entry.get('hypothesis', 'Unknown')}**")
             with col2:
                 if entry.get('p_value') is not None:
                     st.markdown(f"**p = {entry['p_value']:.4f}**")
@@ -332,7 +523,7 @@ def render_discovery_tab():
                     st.write(f"**Hazard Ratio:** {entry['hazard_ratio']:.2f}")
                 
                 if entry.get('test_code'):
-                    st.code(entry['test_code'][:500], language='python')
+                    st.code(entry['test_code'][:1000], language='python')
                 
                 if entry.get('execution_result'):
                     with st.expander("Execution Output"):

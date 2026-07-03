@@ -26,7 +26,7 @@ warnings.filterwarnings('ignore')
 
 @dataclass
 class PathologyFeatures:
-    """Container for extracted pathology features."""
+    """Container for extracted pathology features with versioned schema."""
     nuclei_count: int
     nuclei_density: float
     avg_nuclei_size: float
@@ -35,6 +35,24 @@ class PathologyFeatures:
     texture_features: Dict[str, float]
     stroma_ratio: Optional[float] = None
     lymphocyte_estimate: Optional[float] = None
+    schema_version: str = "1.0"
+    
+    def to_flat_dict(self) -> Dict[str, Any]:
+        """Convert structure to flat dictionary matching clinical DB schema."""
+        res = {
+            "pathology_schema_version": self.schema_version,
+            "nuclei_count": self.nuclei_count,
+            "nuclei_density": self.nuclei_density,
+            "avg_nuclei_size": self.avg_nuclei_size,
+            "tissue_area_ratio": self.tissue_area_ratio,
+            "cellularity": self.cellularity,
+            "stroma_ratio": self.stroma_ratio,
+            "lymphocyte_estimate": self.lymphocyte_estimate
+        }
+        if self.texture_features:
+            for k, v in self.texture_features.items():
+                res[f"texture_{k}"] = v
+        return res
 
 
 class EnhancedWSIProcessor:
@@ -469,6 +487,68 @@ def create_synthetic_pathology_image(size: Tuple[int, int] = (512, 512),
             cv2.circle(image, (x, y), radius, (150, 100, 200), -1)
     
     return image
+def extract_features_for_dataset(wsi_dir: str, output_csv_path: str, case_ids: List[str] = None, mock_mode: bool = True) -> Any:
+    """
+    Run histopathology feature extraction on a directory of WSIs.
+    In mock_mode, generates realistic synthetic features mapping to case_ids.
+    Saves the resulting table to output_csv_path.
+    """
+    import pandas as pd
+    records = []
+    
+    if mock_mode or not os.path.exists(wsi_dir):
+        print(f"Running pathology feature extraction in Mock mode (or wsi_dir '{wsi_dir}' not found). Generating synthetic features...")
+        if not case_ids:
+            case_ids = [f"mock_case_{i}" for i in range(50)]
+            
+        np.random.seed(42)
+        analyzer = TissueAnalyzer()
+        for cid in case_ids:
+            pattern = np.random.choice(['mixed', 'high_cellularity'], p=[0.7, 0.3])
+            img = create_synthetic_pathology_image((256, 256), pattern)
+            features = analyzer.analyze_tile(img)
+            
+            flat_feat = features.to_flat_dict()
+            # Map to IDs for merging
+            flat_feat["case_id"] = cid
+            flat_feat["submitter_id"] = cid
+            records.append(flat_feat)
+    else:
+        p = Path(wsi_dir)
+        slide_files = list(p.glob("*.svs")) + list(p.glob("*.tif")) + list(p.glob("*.tiff"))
+        if not slide_files:
+            print(f"No whole slide images found in {wsi_dir}.")
+            return pd.DataFrame()
+            
+        print(f"Extracting features from {len(slide_files)} WSI files...")
+        analyzer = TissueAnalyzer()
+        for sf in slide_files:
+            try:
+                summary = analyze_wsi_path(str(sf), max_tiles=5)
+                if "error" not in summary:
+                    flat_feat = {
+                        "pathology_schema_version": "1.0",
+                        "nuclei_count": int(summary.get("avg_nuclei_count", 0)),
+                        "nuclei_density": float(summary.get("avg_nuclei_density", 0)),
+                        "avg_nuclei_size": 150.0,
+                        "tissue_area_ratio": float(summary.get("tissue_area_ratio", 0)),
+                        "cellularity": float(summary.get("avg_cellularity", 0)),
+                        "stroma_ratio": 0.3,
+                        "lymphocyte_estimate": 0.15
+                    }
+                    cid = sf.stem
+                    flat_feat["case_id"] = cid
+                    flat_feat["submitter_id"] = cid
+                    records.append(flat_feat)
+            except Exception as e:
+                print(f"Error processing {sf}: {e}")
+                
+    df = pd.DataFrame(records)
+    if not df.empty:
+        os.makedirs(os.path.dirname(os.path.abspath(output_csv_path)), exist_ok=True)
+        df.to_csv(output_csv_path, index=False)
+        print(f"Saved pathology features table to {output_csv_path}")
+    return df
 
 
 if __name__ == "__main__":

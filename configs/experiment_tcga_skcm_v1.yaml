@@ -1,0 +1,26 @@
+# DERMA-Agent Experiment Configuration
+experiment_name: "TCGA-SKCM Melanoma Prognostic Biomarkers"
+schema_version: "1.0"
+random_seed: 42
+
+# Cohort Selection
+cohorts:
+  "Skin Cancer": "TCGA-SKCM"
+
+# Execution Settings
+parallel_workers: 2
+hypotheses_per_cohort: 3
+significance_threshold: 0.05
+use_knowledge_fabric: true
+auto_correct_errors: true
+save_intermediate: true
+timeout_seconds: 120
+
+# Data Layer Settings
+missing_data_strategy: "impute_median" # Options: 'drop', 'impute_median', 'impute_mean'
+censoring_treatment: "right_censored"
+local_mirror_dir: null # Path to local TCGA data dumps if running offline
+
+# LLM Configuration
+llm_model: "gpt-4-turbo-preview"
+temperature: 0.2

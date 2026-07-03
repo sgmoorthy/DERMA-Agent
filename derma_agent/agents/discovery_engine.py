@@ -7,6 +7,8 @@ import os
 import json
 import asyncio
 import time
+import random
+from datetime import datetime
 from typing import TypedDict, List, Dict, Any, Optional, Callable
 from dataclasses import dataclass, field
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
@@ -39,6 +41,8 @@ class DiscoveryResult:
     significant: bool = False
     iteration: int = 0
     execution_time: float = 0.0
+    kg_confidence_score: Optional[float] = None
+    kg_evidence_path: Optional[str] = None
     
     def to_dict(self) -> Dict:
         return {
@@ -51,13 +55,18 @@ class DiscoveryResult:
             "confidence_interval": self.confidence_interval,
             "significant": self.significant,
             "iteration": self.iteration,
-            "execution_time": self.execution_time
+            "execution_time": self.execution_time,
+            "kg_confidence_score": self.kg_confidence_score,
+            "kg_evidence_path": self.kg_evidence_path
         }
 
 
 @dataclass
 class DiscoveryConfig:
     """Configuration for the discovery engine."""
+    experiment_name: str = "default_experiment"
+    schema_version: str = "1.0"
+    random_seed: int = 42
     max_iterations: int = 3
     parallel_workers: int = 4
     hypothesis_per_cohort: int = 3
@@ -66,6 +75,51 @@ class DiscoveryConfig:
     auto_correct_errors: bool = True
     save_intermediate: bool = True
     timeout_seconds: int = 120
+    
+    # Data Layer
+    missing_data_strategy: str = "impute_median"  # 'drop', 'impute_median', 'impute_mean'
+    censoring_treatment: str = "right_censored"
+    local_mirror_dir: Optional[str] = None
+    
+    # LLM
+    llm_model: str = "gpt-4-turbo-preview"
+    temperature: float = 0.2
+
+    @classmethod
+    def load_from_yaml(cls, filepath: str) -> 'DiscoveryConfig':
+        """Load configuration from a YAML file."""
+        try:
+            import yaml
+            with open(filepath, 'r') as f:
+                data = yaml.safe_load(f)
+            # Filter keys to match dataclass fields
+            valid_keys = {k: v for k, v in data.items() if k in cls.__dataclass_fields__}
+            return cls(**valid_keys)
+        except ImportError:
+            print("PyYAML not installed, attempting JSON fallback")
+            try:
+                with open(filepath, 'r') as f:
+                    data = json.load(f)
+                valid_keys = {k: v for k, v in data.items() if k in cls.__dataclass_fields__}
+                return cls(**valid_keys)
+            except Exception as e:
+                print(f"Error loading JSON fallback: {e}")
+                return cls()
+        except Exception as e:
+            print(f"Error loading config from {filepath}: {e}. Using defaults.")
+            return cls()
+
+    def save_to_yaml(self, filepath: str) -> None:
+        """Save configuration to a YAML file."""
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        try:
+            import yaml
+            with open(filepath, 'w') as f:
+                yaml.safe_dump(data, f, default_flow_style=False)
+        except ImportError:
+            print("PyYAML not installed, saving as JSON")
+            with open(filepath, 'w') as f:
+                json.dump(data, f, indent=2)
 
 
 class FastDiscoveryEngine:
@@ -75,9 +129,14 @@ class FastDiscoveryEngine:
     
     def __init__(self, config: DiscoveryConfig = None, knowledge_fabric: KnowledgeFabric = None):
         self.config = config or DiscoveryConfig()
+        
+        # Enforce deterministic random seed
+        random.seed(self.config.random_seed)
+        np.random.seed(self.config.random_seed)
+        
         self.knowledge_fabric = knowledge_fabric
         self.data_client = get_data_client()
-        self.stats_engine = EnhancedStatsEngine()
+        self.stats_engine = EnhancedStatsEngine(random_seed=self.config.random_seed)
         self.ledger: List[Dict] = []
         self.results: List[DiscoveryResult] = []
         
@@ -164,6 +223,17 @@ Examples of good hypotheses:
         # Generate test code
         code = self._generate_test_code(hypothesis, df, iteration)
         
+        # Compute Knowledge Fabric confidence if available
+        kg_score = None
+        kg_path = None
+        if self.knowledge_fabric and self.config.use_knowledge_fabric:
+            try:
+                kg_info = self.knowledge_fabric.calculate_hypothesis_prior_score(hypothesis)
+                kg_score = kg_info.get("score")
+                kg_path = kg_info.get("evidence_path")
+            except Exception as e:
+                print(f"Error querying knowledge fabric for hypothesis score: {e}")
+        
         # Execute test
         try:
             result = self.stats_engine.execute_survival_analysis(code, df)
@@ -185,7 +255,9 @@ Examples of good hypotheses:
                 hazard_ratio=hr,
                 significant=(p_value is not None and p_value < self.config.significance_threshold),
                 iteration=iteration,
-                execution_time=execution_time
+                execution_time=execution_time,
+                kg_confidence_score=kg_score,
+                kg_evidence_path=kg_path
             )
             
         except Exception as e:
@@ -198,7 +270,9 @@ Examples of good hypotheses:
                 execution_result=error_msg,
                 conclusion="Test failed due to execution error",
                 iteration=iteration,
-                execution_time=execution_time
+                execution_time=execution_time,
+                kg_confidence_score=kg_score,
+                kg_evidence_path=kg_path
             )
     
     def _generate_test_code(self, hypothesis: str, df: pd.DataFrame, 
@@ -351,7 +425,12 @@ else:
         
         # Fetch and prepare data
         print("  📊 Fetching clinical data...")
-        df = self.data_client.get_survival_analysis_ready_data(project_id)
+        df = self.data_client.get_survival_analysis_ready_data(
+            project_id=project_id,
+            missing_data_strategy=self.config.missing_data_strategy,
+            censoring_treatment=self.config.censoring_treatment,
+            local_mirror_dir=self.config.local_mirror_dir
+        )
         df = self.data_client.enrich_with_derived_features(df)
         
         if df.empty:
@@ -442,9 +521,14 @@ else:
         return engine.discover_single_cohort(project_id, cancer_type)
     
     def _log_result(self, result: DiscoveryResult, project_id: str) -> None:
-        """Log a discovery result."""
+        """Log a discovery result with experiment metadata."""
         entry = {
             "project_id": project_id,
+            "experiment_name": self.config.experiment_name,
+            "schema_version": self.config.schema_version,
+            "random_seed": self.config.random_seed,
+            "llm_model": self.config.llm_model,
+            "knowledge_fabric_version": self.knowledge_fabric.version if (self.knowledge_fabric and hasattr(self.knowledge_fabric, "version")) else "1.0",
             **result.to_dict()
         }
         self.ledger.append(entry)
@@ -455,10 +539,22 @@ else:
         return [r for r in self.results if r.significant]
     
     def save_ledger(self, filepath: str) -> None:
-        """Save discovery ledger to file."""
+        """Save discovery ledger to file wrapped with metadata and provenance."""
         Path(filepath).parent.mkdir(parents=True, exist_ok=True)
+        provenance = {}
+        if hasattr(self.data_client, "get_provenance_metadata"):
+            provenance = self.data_client.get_provenance_metadata()
+            
+        output_data = {
+            "schema_version": self.config.schema_version,
+            "experiment_name": self.config.experiment_name,
+            "timestamp": datetime.now().isoformat(),
+            "config": {k: v for k, v in self.config.__dict__.items() if not k.startswith('_')},
+            "provenance": provenance,
+            "ledger": self.ledger
+        }
         with open(filepath, 'w') as f:
-            json.dump(self.ledger, f, indent=2, default=str)
+            json.dump(output_data, f, indent=2, default=str)
     
     def generate_summary_report(self) -> Dict[str, Any]:
         """Generate a summary report of all discoveries."""

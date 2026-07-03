@@ -130,6 +130,7 @@ cache/
 *.json
 !package.json
 !tsconfig.json
+*.sqlite
 
 # Large files
 *.tif

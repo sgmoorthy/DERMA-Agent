@@ -83,6 +83,14 @@ class KnowledgeFabric:
         self.nodes: Dict[str, Node] = {}
         self.edges: List[Edge] = []
         self._embedding_cache: Dict[str, np.ndarray] = {}
+        self.version = "1.0"
+        self.data_sources = {
+            "Gene": "NCBI / HGNC / COSMIC",
+            "Disease": "MeSH / TCGA",
+            "Drug": "DrugBank / FDA",
+            "Pathway": "Reactome / KEGG",
+            "Clinical_Feature": "TCGA / GDC"
+        }
         
     def add_node(self, node: Node) -> None:
         """Add a node to the knowledge graph."""
@@ -223,6 +231,8 @@ class KnowledgeFabric:
         """Save the knowledge graph to a JSON file."""
         data = {
             "name": self.name,
+            "version": getattr(self, "version", "1.0"),
+            "data_sources": getattr(self, "data_sources", {}),
             "nodes": [node.to_dict() for node in self.nodes.values()],
             "edges": [edge.to_dict() for edge in self.edges]
         }
@@ -238,6 +248,8 @@ class KnowledgeFabric:
             data = json.load(f)
             
         fabric = cls(name=data.get("name", "loaded-kg"))
+        fabric.version = data.get("version", "1.0")
+        fabric.data_sources = data.get("data_sources", {})
         
         for node_data in data.get("nodes", []):
             fabric.add_node(Node.from_dict(node_data))
@@ -246,6 +258,202 @@ class KnowledgeFabric:
             fabric.add_edge(Edge.from_dict(edge_data))
             
         return fabric
+    
+    def find_scientific_pathways(self, start: str, end: str, allowed_relations: List[str] = None) -> List[List[Dict[str, Any]]]:
+        """Find scientific pathways between two nodes in the graph, optionally filtering by allowed relation types."""
+        if start not in self.nodes or end not in self.nodes:
+            return []
+        
+        # Standard BFS to find all paths up to length 4
+        paths = []
+        queue = [[(start, None)]]
+        
+        while queue:
+            path = queue.pop(0)
+            current = path[-1][0]
+            
+            if len(path) > 4:
+                continue
+                
+            if current == end:
+                paths.append(path)
+                continue
+                
+            if current in self.graph:
+                for successor in self.graph.successors(current):
+                    edge_data = self.graph.get_edge_data(current, successor)
+                    relation = edge_data.get("relation")
+                    
+                    if allowed_relations and relation not in allowed_relations:
+                        continue
+                        
+                    # Avoid loops
+                    visited = [step[0] for step in path]
+                    if successor not in visited:
+                        new_path = list(path)
+                        new_path.append((successor, relation))
+                        queue.append(new_path)
+                     
+        # Format paths nicely
+        formatted_paths = []
+        for p in paths:
+            formatted_path = []
+            for i in range(len(p) - 1):
+                node_a = self.nodes.get(p[i][0])
+                node_b = self.nodes.get(p[i+1][0])
+                relation = p[i+1][1]
+                formatted_path.append({
+                    "source": node_a,
+                    "relation": relation,
+                    "target": node_b
+                })
+            formatted_paths.append(formatted_path)
+            
+        return formatted_paths
+
+    def calculate_hypothesis_prior_score(self, hypothesis: str) -> Dict[str, Any]:
+        """Statically analyze a hypothesis to find supporting links in the KG and calculate a confidence score."""
+        hyp_lower = hypothesis.lower()
+        
+        # Identify genes in the hypothesis
+        found_genes = []
+        for nid, node in self.nodes.items():
+            if node.label == "Gene" and nid.lower() in hyp_lower:
+                found_genes.append(nid)
+                 
+        # Identify cancers/diseases in the hypothesis
+        found_diseases = []
+        for nid, node in self.nodes.items():
+            if node.label == "Disease" and (nid.lower() in hyp_lower or node.properties.get("name", "").lower() in hyp_lower):
+                found_diseases.append(nid)
+                 
+        if not found_genes or not found_diseases:
+            return {
+                "score": 0.3, # default baseline prior for novel hypothesis
+                "evidence_path": "No matching gene-disease path found in knowledge fabric",
+                "strategy": "Novel hypothesis (unsupported by graph prior)"
+            }
+             
+        best_score = 0.3
+        best_path_str = ""
+        best_strategy = "Novel hypothesis"
+         
+        # Check all gene-disease pairs
+        for gene in found_genes:
+            for disease in found_diseases:
+                # Check direct edge first
+                if self.graph.has_edge(gene, disease):
+                     edge_data = self.graph.get_edge_data(gene, disease)
+                     rel = edge_data.get("relation", "ASSOCIATED_WITH")
+                     score = 0.9 if rel in ["MUTATED_IN", "PROGNOSTIC_FACTOR_FOR"] else 0.7
+                     if score > best_score:
+                         best_score = score
+                         best_path_str = f"{gene} -[{rel}]-> {disease}"
+                         best_strategy = f"Direct clinical connection: {rel}"
+                         
+                # Check paths of length up to 3
+                paths = self.find_scientific_pathways(gene, disease)
+                for path in paths:
+                     path_len = len(path)
+                     score = 0.8 if path_len == 2 else (0.6 if path_len == 3 else 0.4)
+                     if score > best_score:
+                         best_score = score
+                         parts = []
+                         for step in path:
+                             parts.append(f"{step['source'].id} -[{step['relation']}]-> {step['target'].id}")
+                         best_path_str = " | ".join(parts)
+                         best_strategy = f"Indirect connection of depth {path_len}"
+                         
+        return {
+            "score": float(best_score),
+            "evidence_path": best_path_str or "No matching path",
+            "strategy": best_strategy
+        }
+
+    def constrained_walk(self, start_node: str, relation_sequence: List[str]) -> List[List[Dict[str, Any]]]:
+        """Walk the graph starting from start_node following the specified relation sequence."""
+        if start_node not in self.nodes:
+            return []
+            
+        current_paths = [[(start_node, None)]]
+        
+        for rel in relation_sequence:
+            next_paths = []
+            for path in current_paths:
+                curr_node_id = path[-1][0]
+                if curr_node_id not in self.graph:
+                    continue
+                for successor_id in self.graph.successors(curr_node_id):
+                    edge_data = self.graph.get_edge_data(curr_node_id, successor_id)
+                    if edge_data.get("relation") == rel:
+                        # Avoid cycles
+                        visited = [step[0] for step in path]
+                        if successor_id not in visited:
+                            new_path = list(path)
+                            new_path.append((successor_id, rel))
+                            next_paths.append(new_path)
+            current_paths = next_paths
+            if not current_paths:
+                break
+                
+        # Format the paths
+        formatted_paths = []
+        for path in current_paths:
+            formatted_path = []
+            for i in range(len(path) - 1):
+                node_a = self.nodes.get(path[i][0])
+                node_b = self.nodes.get(path[i+1][0])
+                relation = path[i+1][1]
+                formatted_path.append({
+                    "source": node_a,
+                    "relation": relation,
+                    "target": node_b
+                })
+            formatted_paths.append(formatted_path)
+            
+        return formatted_paths
+
+    def compute_confidence_score(self, path: List[Dict[str, Any]]) -> float:
+        """Compute prior confidence score (0.0 to 1.0) based on cumulative edge weights and path length."""
+        if not path:
+            return 0.0
+            
+        score = 1.0
+        for step in path:
+            source_id = step["source"].id
+            target_id = step["target"].id
+            relation = step["relation"]
+            
+            edge_data = self.graph.get_edge_data(source_id, target_id)
+            weight = 1.0
+            if edge_data:
+                weight = edge_data.get("weight", 1.0)
+            
+            # Additional discounts based on relation significance
+            discount = 1.0
+            if relation in ["MUTATED_IN", "PREDICTS_RESPONSE_TO", "PROGNOSTIC_FACTOR_FOR"]:
+                discount = 1.0
+            elif relation in ["TREATS", "TARGETS"]:
+                discount = 0.9
+            else:
+                discount = 0.7
+                
+            score *= (weight * discount)
+            
+        # Discount by path length (longer paths have lower prior confidence)
+        length_penalty = 1.0 / (len(path) ** 0.5)
+        return float(max(0.0, min(1.0, score * length_penalty)))
+
+    def get_kg_metadata(self) -> Dict[str, Any]:
+        """Return metadata block for the knowledge graph."""
+        from datetime import datetime
+        return {
+            "version": getattr(self, "version", "1.0"),
+            "data_sources": getattr(self, "data_sources", {}),
+            "node_count": len(self.nodes),
+            "edge_count": len(self.edges),
+            "timestamp": datetime.now().isoformat()
+        }
     
     def to_networkx(self) -> nx.DiGraph:
         """Return the underlying NetworkX graph for advanced operations."""

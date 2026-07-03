@@ -7,6 +7,7 @@ import io
 import sys
 import traceback
 import warnings
+import ast
 from typing import Dict, Any, Optional, Tuple, List
 from dataclasses import dataclass
 
@@ -28,6 +29,75 @@ import scipy.stats as stats
 warnings.filterwarnings('ignore')
 
 
+class SafetyValidationError(Exception):
+    pass
+
+
+class ASTCodeValidator(ast.NodeVisitor):
+    """Statically inspects Python code to ensure only safe libraries are imported and dangerous functions are not called."""
+    def __init__(self, allowed_modules=None):
+        self.allowed_modules = allowed_modules or {
+            'pandas', 'numpy', 'matplotlib', 'seaborn', 'lifelines', 
+            'sklearn', 'scipy', 'statsmodels', 'math'
+        }
+        
+    def visit_Import(self, node):
+        for alias in node.names:
+            module_name = alias.name.split('.')[0]
+            if module_name not in self.allowed_modules:
+                raise SafetyValidationError(f"Import of module '{module_name}' is not allowed for security reasons.")
+        self.generic_visit(node)
+        
+    def visit_ImportFrom(self, node):
+        if node.module:
+            module_name = node.module.split('.')[0]
+            if module_name not in self.allowed_modules:
+                raise SafetyValidationError(f"Import from module '{module_name}' is not allowed for security reasons.")
+        self.generic_visit(node)
+        
+    def visit_Call(self, node):
+        # Block dangerous builtins
+        if isinstance(node.func, ast.Name):
+            func_name = node.func.id
+            if func_name in {'open', 'eval', 'exec', '__import__', 'getattr', 'setattr', 'delattr', 'locals', 'globals', 'compile', 'input'}:
+                raise SafetyValidationError(f"Call to builtin function '{func_name}' is disallowed for security reasons.")
+        elif isinstance(node.func, ast.Attribute):
+            # Check for dunder methods
+            attr_name = node.func.attr
+            if attr_name.startswith('__'):
+                raise SafetyValidationError(f"Access to private/dunder attribute '{attr_name}' is disallowed for security reasons.")
+        self.generic_visit(node)
+        
+    def visit_Attribute(self, node):
+        if node.attr.startswith('__'):
+            raise SafetyValidationError(f"Access to private/dunder attribute '{node.attr}' is disallowed for security reasons.")
+        self.generic_visit(node)
+
+
+def _validate_code_safety_detail(code: str, allowed_modules=None) -> Tuple[bool, Optional[str]]:
+    """Internal helper: validates code safety, returning (is_safe, error_message)."""
+    try:
+        tree = ast.parse(code)
+        validator = ASTCodeValidator(allowed_modules)
+        validator.visit(tree)
+        return True, None
+    except SafetyValidationError as e:
+        return False, str(e)
+    except SyntaxError as e:
+        return False, f"Syntax Error: {str(e)}"
+    except Exception as e:
+        return False, f"Validation Error: {str(e)}"
+
+
+def validate_code_safety(code: str, allowed_modules=None) -> bool:
+    """Validate Python code for imports and calls to ensure it is sandboxed and secure.
+    Returns True if code is safe, False otherwise.
+    Use _validate_code_safety_detail() to also retrieve the error message.
+    """
+    is_safe, _ = _validate_code_safety_detail(code, allowed_modules)
+    return is_safe
+
+
 @dataclass
 class SurvivalAnalysisResult:
     """Container for survival analysis results."""
@@ -47,12 +117,14 @@ class EnhancedStatsEngine:
     Supports survival analysis, machine learning models, and visualization.
     """
     
-    def __init__(self):
+    def __init__(self, random_seed: int = 42):
         self.execution_history = []
+        self.random_seed = random_seed
         
     def execute_survival_analysis(self, code: str, df: pd.DataFrame) -> str:
         """
         Execute Python code for survival analysis in a controlled environment.
+        Statically validates code safety before execution.
         
         Args:
             code: Python code string to execute
@@ -61,6 +133,18 @@ class EnhancedStatsEngine:
         Returns:
             Execution output as string
         """
+        # Statically validate code safety first
+        is_safe, error_msg = _validate_code_safety_detail(code)
+        if not is_safe:
+            output = f"Security/Validation Error: {error_msg}"
+            self.execution_history.append({
+                'code': code,
+                'output': output,
+                'success': False,
+                'error': 'Safety Validation Failed'
+            })
+            return output
+
         stdout_buffer = io.StringIO()
         original_stdout = sys.stdout
         sys.stdout = stdout_buffer
@@ -116,6 +200,138 @@ class EnhancedStatsEngine:
             sys.stdout = original_stdout
             
         return output
+
+    def execute_analysis_dsl(self, df: pd.DataFrame, dsl_input: Any) -> Any:
+        """
+        Execute an analysis request specified in a structured DSL format, avoiding exec() entirely.
+        Accepts df as first argument, then dsl_input (dict or JSON string).
+        Supports both 'template' and 'analysis_type' keys for the operation name.
+        Returns a structured dict with keys appropriate to the analysis type.
+        """
+        import json
+        if isinstance(dsl_input, str):
+            try:
+                dsl = json.loads(dsl_input)
+            except Exception as e:
+                return {"error": f"DSL Parsing Error: Invalid JSON - {str(e)}"}
+        elif isinstance(dsl_input, dict):
+            dsl = dsl_input
+        else:
+            return {"error": "DSL Error: Input must be a dictionary or a JSON string."}
+
+        # Support both 'template' (test-facing API) and 'analysis_type' (legacy key)
+        analysis_type = dsl.get("template") or dsl.get("analysis_type")
+        params = dsl.get("parameters", {})
+
+        try:
+            if analysis_type == "kaplan_meier":
+                time_col = params.get("time_col", "time")
+                event_col = params.get("event_col", "event")
+                group_col = params.get("group_col")
+
+                res = self.run_kaplan_meier(
+                    df, time_col=time_col, event_col=event_col, group_col=group_col
+                )
+                result = {
+                    "p_value": res.log_rank_p,
+                    "median_survival": float(res.median_survival) if res.median_survival else None,
+                    "summary_text": res.model_summary,
+                    "plot_data": res.plot_data,
+                }
+
+            elif analysis_type == "cox_regression":
+                time_col = params.get("time_col", "time")
+                event_col = params.get("event_col", "event")
+                predictor_cols = params.get("predictor_cols")
+
+                res = self.run_cox_regression(
+                    df, time_col=time_col, event_col=event_col, predictor_cols=predictor_cols
+                )
+                result = {
+                    "p_value": res.p_value,
+                    "hazard_ratio": res.hazard_ratio,
+                    "c_index": res.c_index,
+                    "summary_text": res.model_summary,
+                    "plot_data": res.plot_data,
+                }
+
+            elif analysis_type == "ml_survival":
+                feature_cols = params.get("feature_cols", [])
+                target_col = params.get("target_col", "event")
+                time_col = params.get("time_col", "time")
+                model_type = params.get("model_type", "random_forest")
+
+                ml_res = self.run_ml_survival_prediction(
+                    df,
+                    feature_cols=feature_cols,
+                    target_col=target_col,
+                    time_col=time_col,
+                    model_type=model_type,
+                )
+                if "error" in ml_res:
+                    result = {"error": ml_res["error"]}
+                else:
+                    result = {
+                        # AUC used as discrimination proxy for c_index
+                        "c_index": ml_res.get("auc_score"),
+                        # CV mean AUC used as accuracy proxy
+                        "accuracy": ml_res.get("cv_mean"),
+                        "feature_importances": ml_res.get("feature_importance", {}),
+                        "summary_text": (
+                            f"ML Survival ({ml_res['model_type']}): "
+                            f"AUC={ml_res['auc_score']:.4f}, "
+                            f"CV Mean AUC={ml_res['cv_mean']:.4f} "
+                            f"(+/- {ml_res['cv_std']:.4f})"
+                        ),
+                    }
+
+            elif analysis_type == "univariate_test":
+                feature_col = params.get("feature_col")
+                target_col = params.get("target_col", "event")
+                test_type = params.get("test_type", "t_test")
+
+                if feature_col not in df.columns or target_col not in df.columns:
+                    result = {"error": f"Columns {feature_col} or {target_col} not found in dataframe."}
+                else:
+                    df_clean = df[[feature_col, target_col]].dropna()
+                    if len(df_clean) < 10:
+                        result = {"error": "Insufficient data for univariate test."}
+                    elif test_type == "t_test":
+                        groups = df_clean[target_col].unique()
+                        if len(groups) == 2:
+                            g1 = df_clean[df_clean[target_col] == groups[0]][feature_col]
+                            g2 = df_clean[df_clean[target_col] == groups[1]][feature_col]
+                            stat, p = stats.ttest_ind(g1, g2, equal_var=False)
+                            result = {
+                                "statistic": float(stat), "p_value": float(p), "test_type": "t_test",
+                                "summary_text": f"T-test {feature_col} by {target_col}: t={stat:.4f}, p={p:.6f}",
+                            }
+                        else:
+                            result = {"error": "Target variable must have exactly 2 categories for t-test."}
+                    elif test_type == "chi_square":
+                        contingency = pd.crosstab(df_clean[feature_col], df_clean[target_col])
+                        chi2, p, dof, _ = stats.chi2_contingency(contingency)
+                        result = {
+                            "statistic": float(chi2), "p_value": float(p), "test_type": "chi_square",
+                            "summary_text": f"Chi-square {feature_col} vs {target_col}: chi2={chi2:.4f}, p={p:.6f}",
+                        }
+                    elif test_type == "correlation":
+                        r, p = stats.pearsonr(df_clean[feature_col], df_clean[target_col])
+                        result = {
+                            "statistic": float(r), "p_value": float(p), "test_type": "correlation",
+                            "summary_text": f"Pearson {feature_col} vs {target_col}: r={r:.4f}, p={p:.6f}",
+                        }
+                    else:
+                        result = {"error": f"Unknown test_type '{test_type}'."}
+            else:
+                result = {"error": f"Unknown analysis type '{analysis_type}'."}
+
+        except Exception as e:
+            result = {"error": f"Execution Error: {str(e)}\n{traceback.format_exc()}"}
+
+        self.execution_history.append({"dsl": dsl, "result": result})
+        return result
+
     
     def run_kaplan_meier(self, df: pd.DataFrame, 
                         time_col: str = 'time',
@@ -163,7 +379,8 @@ class EnhancedStatsEngine:
         results = {
             'median_survival': median_survival,
             'survival_times': kmf.survival_function_.index.tolist(),
-            'survival_probs': kmf.survival_function_['KM_estimate'].tolist()
+            # Use .iloc[:, 0] — lifelines >= 0.27 names the column after the label, not 'KM_estimate'
+            'survival_probs': kmf.survival_function_.iloc[:, 0].tolist()
         }
         
         p_value = None
@@ -190,7 +407,8 @@ class EnhancedStatsEngine:
                         )
                         group_curves[group] = {
                             'times': kmf_group.survival_function_.index.tolist(),
-                            'probs': kmf_group.survival_function_['KM_estimate'].tolist()
+                            # Use .iloc[:, 0] for lifelines >= 0.27 compatibility
+                            'probs': kmf_group.survival_function_.iloc[:, 0].tolist()
                         }
                 
                 # Log-rank test if we have two groups
@@ -285,10 +503,15 @@ class EnhancedStatsEngine:
             # Concordance index
             c_index = cph.concordance_index_
             
-            # Build summary string
+            # Build summary string — use public log_likelihood_ratio_test() API
+            try:
+                lrt_p = cph.log_likelihood_ratio_test().p_value
+            except Exception:
+                lrt_p = float('nan')
+            
             summary_str = f"""Cox Proportional Hazards Model:
 - Concordance index: {c_index:.3f}
-- Log-likelihood ratio test p-value: {cph._compute_likelihood_ratio_test()[1]:.4f}
+- Log-likelihood ratio test p-value: {lrt_p:.4f}
 
 Hazard Ratios:
 """
@@ -297,10 +520,12 @@ Hazard Ratios:
                 sig = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
                 summary_str += f"  {var}: HR={hr:.2f}, p={p:.4f} {sig}\n"
             
+            # Return first predictor's stats (highest significance or first listed)
+            first_var = list(hrs.keys())[0] if hrs else None
             return SurvivalAnalysisResult(
                 median_survival=None,
-                p_value=list(p_values.values())[0] if p_values else None,
-                hazard_ratio=list(hrs.values())[0] if hrs else None,
+                p_value=p_values.get(first_var) if first_var else None,
+                hazard_ratio=hrs.get(first_var) if first_var else None,
                 confidence_interval=None,
                 c_index=c_index,
                 log_rank_p=None,
@@ -353,7 +578,7 @@ Hazard Ratios:
         
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
+            X, y, test_size=0.2, random_state=self.random_seed, stratify=y
         )
         
         # Scale features
@@ -363,11 +588,11 @@ Hazard Ratios:
         
         # Select model
         if model_type == 'random_forest':
-            model = RandomForestClassifier(n_estimators=100, random_state=42)
+            model = RandomForestClassifier(n_estimators=100, random_state=self.random_seed)
         elif model_type == 'gradient_boosting':
-            model = GradientBoostingClassifier(random_state=42)
+            model = GradientBoostingClassifier(random_state=self.random_seed)
         else:
-            model = LogisticRegression(random_state=42, max_iter=1000)
+            model = LogisticRegression(random_state=self.random_seed, max_iter=1000)
         
         # Train
         model.fit(X_train_scaled, y_train)

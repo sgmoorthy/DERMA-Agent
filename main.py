@@ -1,7 +1,7 @@
 import os
 import argparse
 from dotenv import load_dotenv
-from agents.orchestrator import run_agent_workflow
+from derma_agent.agents.orchestrator import run_agent_workflow
 from tools.gdc_client import CANCER_PROJECTS
 
 def main():

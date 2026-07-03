@@ -148,7 +148,7 @@ def demo_discovery(kg, df):
     print("🚀 DEMO 4: Fast Discovery Engine - Hypothesis Testing")
     print("="*60)
     
-    from agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
+    from derma_agent.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
     
     # Configure for quick demo (1 hypothesis to save time)
     config = DiscoveryConfig(

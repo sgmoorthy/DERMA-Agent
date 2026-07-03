@@ -1,0 +1,6 @@
+streamlit
+networkx
+crewai
+crewai-soul
+pandas
+matplotlib
