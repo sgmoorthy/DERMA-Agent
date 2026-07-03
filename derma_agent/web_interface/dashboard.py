@@ -6,7 +6,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import matplotlib.cm as cm
 import networkx as nx
 from scipy.stats import mannwhitneyu
 from lifelines import KaplanMeierFitter
@@ -60,7 +59,7 @@ def plot_kaplan_meier(df: pd.DataFrame) -> io.BytesIO:
     ax.legend(framealpha=0.3, labelcolor="#f0f0f0", facecolor="#1a1a2e")
     ax.grid(axis="y", color="#333333", linestyle="--", alpha=0.5)
     fig.tight_layout()
-    return _buf(fig), p_val
+    return _buf(fig)
 
 
 def plot_tissue_radar(titan_features: dict) -> io.BytesIO:
@@ -75,7 +74,7 @@ def plot_tissue_radar(titan_features: dict) -> io.BytesIO:
         titan_features["tissue_density"],
         pattern_score,
         nuclei_norm,
-        1 - titan_features["cellularity"] * 0.4,   # mock uniformity
+        1 - titan_features["cellularity"] * 0.4,
     ]
     N = len(labels)
     angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
@@ -137,11 +136,7 @@ def plot_kg_graph(fabric: KnowledgeFabric) -> io.BytesIO:
 
 
 def plot_apollo_embedding(embedding: np.ndarray, slide_id: str) -> io.BytesIO:
-    """
-    Quick visualisation of the 768-dim APOLLO embedding:
-    – Bar chart of top-20 absolute magnitude dimensions
-    – Background distribution shown as fill_between
-    """
+    """Visualisation of the 768-dim APOLLO embedding."""
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 3.5))
     fig.patch.set_facecolor("#0f1117")
     for ax in (ax1, ax2): ax.set_facecolor("#0f1117")
@@ -179,6 +174,8 @@ def plot_cellularity_survival(df: pd.DataFrame) -> io.BytesIO:
 
     colors = df["event"].map({1: "#e63946", 0: "#4cc9f0"})
     ax.scatter(df["cellularity"], df["time"], c=colors, alpha=0.65, s=25, edgecolors="none")
+    
+    # Linear trendline
     m, b = np.polyfit(df["cellularity"], df["time"], 1)
     x_line = np.linspace(df["cellularity"].min(), df["cellularity"].max(), 100)
     ax.plot(x_line, m * x_line + b, color="#f4a261", lw=2, linestyle="--", label="Trend")
@@ -202,62 +199,38 @@ def plot_cellularity_survival(df: pd.DataFrame) -> io.BytesIO:
 
 def run_scientific_workflow(cohort: str, tissue_slide_id: str):
     """
-    Full agentic perception-action loop with rich visualisations at every phase.
+    Full agentic perception-action loop.
+    Appends generated outputs to st.session_state.discovery_runs list.
     """
     # ── Step 1: Perception ──────────────────────────────────────────────────
-    with st.status("🔭 Phase 1 — WSI Perception & Foundation Model Inference", expanded=True) as s:
+    with st.status("🔭 Phase 1 — WSI Perception & Foundation Model Inference", expanded=False) as s:
         wsi = WSIEngine()
         slide_metadata = wsi.ingest_slide(tissue_slide_id)
         titan_features  = wsi.get_titan_classification(tissue_slide_id)
         apollo_emb      = wsi.get_apollo_embeddings(tissue_slide_id)
-
-        st.write(f"✅ Slide `{tissue_slide_id}` ingested — dims {slide_metadata['dimensions']}, "
-                 f"{slide_metadata['microns_per_pixel']} µm/px")
-        st.write(f"✅ TITAN classification: **{titan_features['primary_pattern']}** pattern, "
-                 f"cellularity **{titan_features['cellularity']:.2f}**, "
-                 f"nuclei count **{titan_features['nuclei_count']}**")
-        st.write(f"✅ APOLLO embedding generated — shape {apollo_emb.shape}")
         s.update(label="✅ Phase 1 complete", state="complete")
 
-    # Perception visualisations (side by side)
-    v1, v2 = st.columns(2)
-    with v1:
-        st.markdown("#### 🎯 TITAN Tissue Characterisation")
-        st.image(plot_tissue_radar(titan_features), use_container_width=True)
-    with v2:
-        st.markdown("#### 🧬 APOLLO Foundation Model Embeddings")
-        st.image(plot_apollo_embedding(apollo_emb, tissue_slide_id), use_container_width=True)
-
-    st.divider()
-
     # ── Step 2: Knowledge Fabric Consultation ───────────────────────────────
-    with st.status("🧠 Phase 2 — Knowledge Fabric Consultation & Hypothesis Formation", expanded=True) as s:
+    with st.status("🧠 Phase 2 — Knowledge Fabric Consultation & Hypothesis Formation", expanded=False) as s:
         fabric = st.session_state.fabric
         priors = fabric.query_context("BRAF")
-        st.write(f"✅ BRAF neighbourhood: **{priors}**")
 
         hypothesis = (
-            f"In cohort **{cohort}**, BRAF mutation status is prognostic of survival, "
+            f"In cohort {cohort}, BRAF mutation status is prognostic of survival, "
             f"correlated with elevated cellularity ({titan_features['cellularity']:.2f}) "
-            f"and **{titan_features['primary_pattern']}** tissue pattern."
+            f"and {titan_features['primary_pattern']} tissue pattern."
         )
-        st.markdown(f"💡 **Formulated Hypothesis**: {hypothesis}")
         s.update(label="✅ Phase 2 complete", state="complete")
 
-    st.markdown("#### 📡 Live Knowledge Fabric Network")
-    st.image(plot_kg_graph(fabric), use_container_width=True)
-
-    st.divider()
-
     # ── Step 3: Generate Statistical Code + AST Critic ──────────────────────
-    with st.status("🛡️ Phase 3 — CodeAct Generation & AST Security Audit", expanded=True) as s:
+    with st.status("🛡️ Phase 3 — CodeAct Generation & AST Security Audit", expanded=False) as s:
         rng = np.random.default_rng(int(sum(ord(c) for c in tissue_slide_id)) % 10000)
         n   = 200
         mock_df = pd.DataFrame({
-            "time":           rng.exponential(600, n) + 100,
-            "event":          rng.binomial(1, 0.4, n),
+            "time":            rng.exponential(600, n) + 100,
+            "event":           rng.binomial(1, 0.4, n),
             "is_braf_mutated": rng.binomial(1, 0.35, n),
-            "cellularity":    rng.uniform(0.1, 0.8, n),
+            "cellularity":     rng.uniform(0.1, 0.8, n),
         })
 
         stat_code = """# Auto-generated CodeAct — Kaplan-Meier on BRAF status
@@ -275,80 +248,65 @@ print("BRAF WT — Median survival:", round(kmf.median_survival_time_, 1), "days
 """
         critic    = CriticAgent()
         is_safe, msg = critic.evaluate_code(stat_code, expected_columns=list(mock_df.columns))
-        icon = "✅" if is_safe else "❌"
-        st.write(f"{icon} **AST Audit**: {msg}")
-
-        with st.expander("📄 View Auto-Generated CodeAct Script"):
-            st.code(stat_code, language="python")
-
+        
         if not is_safe:
-            st.error(f"Execution blocked by Critic Agent: {msg}")
-            st.session_state.narrative.log_discovery(
-                hypothesis.replace("**", ""), f"BLOCKED — {msg}")
-            s.update(label="❌ Phase 3 — Execution blocked", state="error")
+            st.session_state.narrative.log_discovery(hypothesis, f"Blocked: {msg}")
+            s.update(label="❌ Phase 3 — Blocked by Critic", state="error")
             return
-
         s.update(label="✅ Phase 3 complete — Code approved", state="complete")
 
     # ── Step 4: Sandbox Execution ───────────────────────────────────────────
-    with st.status("⚡ Phase 4 — Restricted Sandbox Execution", expanded=True) as s:
+    with st.status("⚡ Phase 4 — Restricted Sandbox Execution", expanded=False) as s:
         executor = CodeExecutor()
         output   = executor.execute(stat_code, {"df": mock_df})
         if "Execution Error" in output:
-            st.error(output)
             s.update(label="❌ Phase 4 — Runtime error", state="error")
             return
-        st.write("✅ Code executed successfully inside restricted namespace.")
-        st.code(output, language="bash")
         s.update(label="✅ Phase 4 complete", state="complete")
 
-    st.divider()
-
-    # ── Step 5: Visualisation Results ───────────────────────────────────────
-    st.markdown("## 📊 Discovery Results")
-
-    r1, r2 = st.columns(2)
-    with r1:
-        km_buf, p_val = plot_kaplan_meier(mock_df)
-        st.markdown("#### 📈 Kaplan-Meier Survival Curves")
-        st.image(km_buf, use_container_width=True)
-
-        sig_label  = "🟢 **SIGNIFICANT** (p < 0.05)" if p_val < 0.05 else "🟡 **Not significant** (p ≥ 0.05)"
-        st.markdown(f"Log-rank test: {sig_label}")
-
-    with r2:
-        st.markdown("#### 🔬 Cellularity vs Survival Time")
-        st.image(plot_cellularity_survival(mock_df), use_container_width=True)
-
-    # Statistical summary table
-    mut_times = mock_df.loc[mock_df["is_braf_mutated"] == 1, "time"]
-    wt_times  = mock_df.loc[mock_df["is_braf_mutated"] == 0, "time"]
+    # Log Rank calculations for structured results
+    mut_mask = mock_df["is_braf_mutated"] == 1
+    wt_mask  = ~mut_mask
+    lr_res   = logrank_test(
+        mock_df.loc[mut_mask, "time"], mock_df.loc[wt_mask, "time"],
+        event_observed_A=mock_df.loc[mut_mask, "event"],
+        event_observed_B=mock_df.loc[wt_mask, "event"]
+    )
+    p_val = lr_res.p_value
+    
+    mut_times = mock_df.loc[mut_mask, "time"]
+    wt_times  = mock_df.loc[wt_mask, "time"]
     _, mwu_p  = mannwhitneyu(mut_times, wt_times, alternative="two-sided")
+    
+    status = "confirmed" if p_val < 0.05 else "rejected"
 
-    stats_df = pd.DataFrame({
-        "Metric": ["Cohort", "Slide ID", "Primary Pattern", "Cellularity",
-                   "BRAF Mutated (n)", "BRAF WT (n)", "Median Survival — Mutated (days)",
-                   "Median Survival — WT (days)", "Log-rank p-value", "Mann-Whitney U p-value"],
-        "Value":  [
-            cohort, tissue_slide_id, titan_features["primary_pattern"],
-            f"{titan_features['cellularity']:.3f}",
-            str(mock_df["is_braf_mutated"].sum()),
-            str((~mock_df["is_braf_mutated"].astype(bool)).sum()),
-            f"{mut_times.median():.1f}", f"{wt_times.median():.1f}",
-            f"{p_val:.4f}", f"{mwu_p:.4f}",
-        ],
+    # Save to history list
+    run_label = f"Hypothesis #{len(st.session_state.discovery_runs) + 1} — BRAF in {cohort}"
+    
+    # Store complete metadata of the run
+    st.session_state.discovery_runs.append({
+        "label": run_label,
+        "cohort": cohort,
+        "slide_id": tissue_slide_id,
+        "hypothesis": hypothesis,
+        "p_value": p_val,
+        "status": status,
+        "mwu_p": mwu_p,
+        "mut_median": mut_times.median(),
+        "wt_median": wt_times.median(),
+        "mock_df": mock_df,
+        "titan_features": titan_features,
+        "apollo_emb": apollo_emb,
+        "stat_code": stat_code,
+        "summary": f"BRAF mutation is prognostic in {cohort} (p={p_val:.4f}; medians: {mut_times.median():.0f}d vs {wt_times.median():.0f}d)"
     })
-    st.markdown("#### 📋 Statistical Summary")
-    st.dataframe(stats_df, use_container_width=True, hide_index=True)
 
-    # ── Step 6: Update Knowledge Fabric & Episodic Log ──────────────────────
-    fabric.add_relationship("BRAF", cohort,
-                            f"PROGNOSTIC_p{p_val:.3f}_{titan_features['primary_pattern']}")
+    # Update knowledge fabric and logs
+    fabric.add_relationship("BRAF", cohort, f"PROGNOSTIC_p{p_val:.3f}_{titan_features['primary_pattern']}")
     st.session_state.narrative.log_discovery(
-        hypothesis.replace("**", ""),
+        hypothesis,
         f"KM p={p_val:.4f} | Mutated median={mut_times.median():.0f}d | WT median={wt_times.median():.0f}d"
     )
-    st.success("🔬 Discovery logged. Knowledge Fabric updated. Scroll up to see the live graph refresh.")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -356,12 +314,17 @@ print("BRAF WT — Median survival:", round(kmf.median_survival_time_, 1), "days
 # ─────────────────────────────────────────────────────────────────────────────
 
 def render_dashboard():
+    # Initialize run log registry if not present
+    if "discovery_runs" not in st.session_state:
+        st.session_state.discovery_runs = []
+
     # ── Sidebar ──────────────────────────────────────────────────────────────
     with st.sidebar:
         st.header("🔬 Discovery Controls")
         cohort   = st.selectbox("Select Target Cohort",
                                 ["TCGA-SKCM", "TCGA-BRCA", "TCGA-LUAD", "TCGA-COAD", "TCGA-GBM"])
         slide_id = st.text_input("Enter Slide ID Target", "WSI-TCGA-SKCM-009A")
+        
         st.divider()
         run_btn = st.button("🚀 Run Generative Discovery Loop", type="primary", use_container_width=True)
 
@@ -372,31 +335,143 @@ def render_dashboard():
     m1, m2, m3, m4 = st.columns(4)
     with m1: render_metric_card("Graph Entities",     str(len(fabric.graph.nodes)),    "🧬", "#4e73df")
     with m2: render_metric_card("Relationships",      str(len(fabric.graph.edges)),    "🔗", "#1cc88a")
-    with m3: render_metric_card("Hypotheses Tested",  str(len(history)),               "💡", "#f6c90e")
+    with m3: render_metric_card("Hypotheses Tested",  str(len(st.session_state.discovery_runs)), "💡", "#f6c90e")
     with m4: render_metric_card("Sandbox Executions", str(st.session_state.get("runs", 0)), "⚡", "#e63946")
 
     st.divider()
 
-    # ── Main layout: KG (left) | Narrative (right) ───────────────────────────
-    col1, col2 = st.columns([1.1, 0.9])
+    # ── main layout columns: col_main (wide left) | col_side (right) ────────
+    col_main, col_side = st.columns([1.8, 1.2])
 
-    with col1:
-        st.markdown("### 📚 Live Knowledge Fabric")
-        st.image(plot_kg_graph(fabric), use_container_width=True)
+    # ── LEFT MAIN: Research Findings & Visualisations ────────────────────────
+    with col_main:
+        # 1. Study summary / Ranked conclusions
+        st.markdown("### 📊 Live Oncology Findings & Conclusions")
+        
+        runs = st.session_state.discovery_runs
+        confirmed_runs = [r for r in runs if r["status"] == "confirmed"]
+        rejected_runs  = [r for r in runs if r["status"] == "rejected"]
+        
+        c_conf, c_rej = st.columns(2)
+        with c_conf:
+            st.markdown("##### 🟢 Validated Prognostic Findings")
+            if confirmed_runs:
+                for r in confirmed_runs:
+                    st.markdown(f"- **{r['cohort']}**: {r['summary']}")
+            else:
+                st.info("No significant prognostic findings validated yet.")
 
-        st.markdown("##### Active Graph Mappings")
-        edges_list = [{"Source": u, "Target": v, "Relation": d.get("relation", "")}
-                      for u, v, d in fabric.graph.edges(data=True)]
-        if edges_list:
-            st.dataframe(pd.DataFrame(edges_list), use_container_width=True, hide_index=True)
+        with c_rej:
+            st.markdown("##### 🟡 Negative Results (Non-significant)")
+            if rejected_runs:
+                for r in rejected_runs:
+                    st.markdown(f"- **{r['cohort']}**: {r['summary']}")
+            else:
+                st.info("No negative outcomes mapped yet.")
 
-    with col2:
-        st.markdown("### 🧠 Episodic Research Narrative")
-        if history:
-            for idx, log in enumerate(reversed(history[-6:])):   # Show last 6
-                render_thought_card(log, len(history) - idx)
+        st.divider()
+
+        # 2. Interactive selector for curves and scatter plots
+        st.markdown("### 📈 Interactive Hypothesis Inspector")
+        if runs:
+            # Let user select from past runs
+            selected_run_label = st.selectbox(
+                "Select Hypothesis Run to Visualize",
+                [r["label"] for r in runs],
+                index=len(runs)-1
+            )
+            # Find the active run dict
+            active_run = next(r for r in runs if r["label"] == selected_run_label)
+            
+            # Display Hypothesis info card
+            st.info(f"**Hypothesis**: *{active_run['hypothesis']}*")
+            
+            # Render plots side by side
+            v1, v2 = st.columns(2)
+            with v1:
+                st.markdown("###### Kaplan-Meier Survival Curve")
+                st.image(plot_kaplan_meier(active_run["mock_df"]), use_container_width=True)
+                st.markdown(f"**Conclusion**: p-value = `{active_run['p_value']:.4f}` (median survival: mutated `{active_run['mut_median']:.0f}` days vs WT `{active_run['wt_median']:.0f}` days)")
+            
+            with v2:
+                st.markdown("###### Slide Cellularity vs Outcomes")
+                st.image(plot_cellularity_survival(active_run["mock_df"]), use_container_width=True)
+                st.markdown(f"**Morphology Link**: Mann-Whitney U test p-value = `{active_run['mwu_p']:.4f}`")
+                
+            # Embed slide details inside an expander
+            with st.expander("🔍 Selected Slide Perception Details (TITAN & APOLLO)"):
+                t1, t2 = st.columns(2)
+                with t1:
+                    st.image(plot_tissue_radar(active_run["titan_features"]), use_container_width=True)
+                with t2:
+                    st.image(plot_apollo_embedding(active_run["apollo_emb"], active_run["slide_id"]), use_container_width=True)
         else:
-            st.info("💡 Initiate a discovery run to populate the research narrative.")
+            st.info("Run the discovery loop in the sidebar to generate interactive KM plots and tissue correlations.")
+
+    # ── RIGHT SIDEBAR: Model Internals (Secondary) & Filtered logs ──────────
+    with col_side:
+        # 1. Collapsible Knowledge Fabric graph
+        st.markdown("### 🛠️ Model Internals")
+        with st.expander("💡 Live Knowledge Fabric Graph", expanded=False):
+            st.caption("This graph represents the prior reasoning space used by the agent to construct hypotheses.")
+            st.image(plot_kg_graph(fabric), use_container_width=True)
+            
+            edges_list = [{"Source": u, "Target": v, "Relation": d.get("relation", "")}
+                          for u, v, d in fabric.graph.edges(data=True)]
+            if edges_list:
+                st.dataframe(pd.DataFrame(edges_list), use_container_width=True, hide_index=True)
+
+        st.divider()
+
+        # 2. Filterable Experiment Timeline Logs
+        st.markdown("### 🧠 Episodic Research Logs")
+        if history:
+            # Filters
+            f_col, f_stat = st.columns(2)
+            with f_col:
+                cohort_filter = st.selectbox("Filter by Cohort", ["All", "TCGA-SKCM", "TCGA-BRCA", "TCGA-LUAD", "TCGA-COAD", "TCGA-GBM"])
+            with f_stat:
+                status_filter = st.selectbox("Filter by Status", ["All", "Confirmed", "Rejected", "Blocked"])
+
+            # Filter logic
+            filtered_logs = []
+            for idx, log in enumerate(reversed(history)):
+                # Categorize logs based on content
+                log_cohort = "All"
+                for c in ["TCGA-SKCM", "TCGA-BRCA", "TCGA-LUAD", "TCGA-COAD", "TCGA-GBM"]:
+                    if c in log:
+                        log_cohort = c
+                        break
+                        
+                log_status = "Rejected"
+                if "Blocked" in log or "BLOCKED" in log:
+                    log_status = "Blocked"
+                elif "KM p=" in log:
+                    # Parse p-value to determine if Confirmed
+                    try:
+                        p_part = log.split("KM p=")[1].split(" |")[0]
+                        p_val = float(p_part)
+                        if p_val < 0.05:
+                            log_status = "Confirmed"
+                    except Exception:
+                        pass
+                
+                # Check filters
+                if cohort_filter != "All" and log_cohort != cohort_filter:
+                    continue
+                if status_filter != "All" and log_status != status_filter:
+                    continue
+                    
+                filtered_logs.append((log, len(history) - idx))
+
+            # Display
+            if filtered_logs:
+                for log, index in filtered_logs[:6]:  # Limit to 6 entries
+                    render_thought_card(log, index)
+            else:
+                st.caption("No logs match the selected filters.")
+        else:
+            st.info("Initiate a discovery run to populate the research logs.")
 
     st.divider()
 
