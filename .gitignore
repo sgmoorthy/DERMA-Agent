@@ -160,3 +160,7 @@ secrets.yml
 # OS
 .DS_Store
 Thumbs.db
+
+# Node / Vite
+node_modules/
+package-lock.json
