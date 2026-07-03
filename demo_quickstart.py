@@ -37,7 +37,7 @@ def demo_knowledge_fabric():
     print("🔬 DEMO 1: Knowledge Fabric - Medical Knowledge Graph")
     print("="*60)
     
-    from tools.knowledge_fabric import create_default_knowledge_fabric
+    from derma_agent.derma_core.knowledge_fabric import create_default_knowledge_fabric
     
     # Create or load knowledge fabric
     kg_path = Path("data/knowledge_fabric.json")
@@ -148,7 +148,7 @@ def demo_discovery(kg, df):
     print("🚀 DEMO 4: Fast Discovery Engine - Hypothesis Testing")
     print("="*60)
     
-    from derma_agent.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
+    from derma_agent.derma_core.derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
     
     # Configure for quick demo (1 hypothesis to save time)
     config = DiscoveryConfig(
@@ -223,7 +223,7 @@ def main():
         print("\nNext steps:")
         print("   1. Launch dashboard: streamlit run app_enhanced.py")
         print("   2. Explore notebook: jupyter notebook notebooks/comprehensive_demo.ipynb")
-        print("   3. Run full discovery: python -c \"from agents.discovery_engine import run_fast_discovery; run_fast_discovery(['Breast Cancer', 'Skin Cancer'])\"")
+        print("   3. Run full discovery: python -c \"from derma_agent.derma_core.agents.discovery_engine import run_fast_discovery; run_fast_discovery(['Breast Cancer', 'Skin Cancer'])\"")
         print("\nFor more info, see README.md")
         print("="*60 + "\n")
         

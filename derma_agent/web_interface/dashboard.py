@@ -18,6 +18,7 @@ from derma_core.perception.wsi_engine import WSIEngine
 from derma_core.actions.code_executor import CodeExecutor
 from derma_core.actions.critic_agent import CriticAgent
 from derma_core.memory.research_log import ResearchNarrative
+from derma_core.agents.research_assistant import ResearchAssistant
 from web_interface.components import render_metric_card, render_thought_card
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -370,6 +371,10 @@ def render_dashboard():
     # Initialize run log registry if not present
     if "discovery_runs" not in st.session_state:
         st.session_state.discovery_runs = []
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+    if "assistant" not in st.session_state:
+        st.session_state.assistant = ResearchAssistant()
 
     # ── Sidebar ──────────────────────────────────────────────────────────────
     with st.sidebar:
@@ -532,8 +537,130 @@ def render_dashboard():
 
     st.divider()
 
+    # ── AI Research Assistant Chat Panel ─────────────────────────────────────
+    _render_chat_panel(cohort, fabric)
+
+    st.divider()
+
     # ── Run loop ─────────────────────────────────────────────────────────────
     if run_btn:
         st.session_state["runs"] = st.session_state.get("runs", 0) + 1
         run_scientific_workflow(cohort, slide_id)
         st.rerun()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Chat Panel
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _render_chat_panel(cohort: str, fabric: KnowledgeFabric) -> None:
+    """Render the full-width AI Research Assistant chat panel."""
+    assistant: ResearchAssistant = st.session_state.assistant
+    runs = st.session_state.discovery_runs
+
+    # Build a short KG summary for context injection
+    kg_edges = [
+        f"{u} --[{d.get('relation','')}]--> {v}"
+        for u, v, d in fabric.graph.edges(data=True)
+    ]
+    fabric_summary = "\n".join(kg_edges) if kg_edges else "Knowledge graph is empty."
+
+    # Inject current session context before every render
+    assistant.update_context(runs, cohort, fabric_summary)
+
+    # ── Header ────────────────────────────────────────────────────────────────
+    st.markdown(
+        """
+        <div style='
+            display:flex; align-items:center; gap:12px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #1a1a3e 0%, #0f1117 100%);
+            border-radius: 14px;
+            border: 1px solid #2a2a5e;
+            margin-bottom: 8px;
+        '>
+            <span style='font-size:2rem;'>🤖</span>
+            <div>
+                <div style='color:#a5b4fc; font-size:1.15rem; font-weight:700;
+                            letter-spacing:.4px;'>
+                    DERMA-Agent Research Assistant
+                </div>
+                <div style='color:#64748b; font-size:.8rem; margin-top:2px;'>
+                    Discuss findings, interpret results, and plan next experiments
+                </div>
+            </div>
+            <span style='margin-left:auto; font-size:.75rem;
+                         color:#6366f1; background:#1e1e4a;
+                         padding:4px 10px; border-radius:20px;
+                         border:1px solid #3730a3;'>
+                {mode}
+            </span>
+        </div>
+        """.format(mode=assistant.mode),
+        unsafe_allow_html=True,
+    )
+
+    # ── Conversation history ───────────────────────────────────────────────────
+    chat_container = st.container()
+    with chat_container:
+        if not st.session_state.chat_history:
+            # Welcome message
+            with st.chat_message("assistant", avatar="🔬"):
+                st.markdown(
+                    "👋 **Hello, researcher!** I have full context about your current "
+                    f"session — cohort **{cohort}**, "
+                    f"**{len(runs)} discovery run(s)** completed, and the live "
+                    "knowledge fabric.\n\n"
+                    "Ask me anything about your findings:\n"
+                    "- *What does the BRAF p-value mean?*\n"
+                    "- *Is BRAF a good prognostic biomarker here?*\n"
+                    "- *What should I test next?*\n"
+                    "- *How do I interpret the KM curve?*"
+                )
+        else:
+            for msg in st.session_state.chat_history:
+                avatar = "🔬" if msg["role"] == "assistant" else "👩‍🔬"
+                with st.chat_message(msg["role"], avatar=avatar):
+                    st.markdown(msg["content"])
+
+    # ── Quick-prompt buttons ───────────────────────────────────────────────────
+    st.markdown("<div style='margin-bottom:6px'>", unsafe_allow_html=True)
+    qp_cols = st.columns(4)
+    quick_prompts = [
+        ("📊 Interpret BRAF result",    "What does the BRAF mutation result mean for this cohort?"),
+        ("📈 Explain KM curve",         "Can you explain the Kaplan-Meier curve and what it shows?"),
+        ("🔬 Suggest next steps",       "What experiments or analyses should I run next?"),
+        ("⚠️ Flag limitations",         "What are the key limitations of this analysis I should be aware of?"),
+    ]
+    for col, (label, prompt) in zip(qp_cols, quick_prompts):
+        with col:
+            if st.button(label, key=f"qp_{label}", use_container_width=True):
+                _handle_chat_message(prompt, assistant)
+                st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # ── Chat input ────────────────────────────────────────────────────────────
+    if user_input := st.chat_input(
+        "Ask about findings, biomarkers, statistical methods, or next steps…"
+    ):
+        _handle_chat_message(user_input, assistant)
+        st.rerun()
+
+    # ── Clear history ─────────────────────────────────────────────────────────
+    if st.session_state.chat_history:
+        if st.button("🗑️ Clear conversation", key="clear_chat"):
+            st.session_state.chat_history = []
+            st.rerun()
+
+
+def _handle_chat_message(user_input: str, assistant: ResearchAssistant) -> None:
+    """Append user message, get AI reply, store both in session state."""
+    # Store user message
+    st.session_state.chat_history.append({"role": "user", "content": user_input})
+
+    # Get assistant reply
+    with st.spinner("🔬 Analysing findings…"):
+        reply = assistant.reply(user_input)
+
+    # Store assistant reply
+    st.session_state.chat_history.append({"role": "assistant", "content": reply})

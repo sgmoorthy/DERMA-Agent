@@ -49,9 +49,9 @@ jobs:
     
     - name: Test imports
       run: |
-        python -c "from tools.knowledge_fabric import KnowledgeFabric; print('KnowledgeFabric OK')"
+        python -c "from derma_agent.derma_core.knowledge_fabric.graph_memory import KnowledgeFabric; print('KnowledgeFabric OK')"
         python -c "from tools.enhanced_data_client import get_data_client; print('DataClient OK')"
         python -c "from tools.enhanced_clinical_stats import EnhancedStatsEngine; print('StatsEngine OK')"
         python -c "from tools.enhanced_pathology import NucleiSegmenter; print('Pathology OK')"
-        python -c "from agents.discovery_engine import FastDiscoveryEngine; print('DiscoveryEngine OK')"
+        python -c "from derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine; print('DiscoveryEngine OK')"
         echo "All imports successful!"

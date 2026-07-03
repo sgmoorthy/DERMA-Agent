@@ -20,14 +20,14 @@ from plotly.subplots import make_subplots
 
 # DERMA-Agent imports
 try:
-    from tools.knowledge_fabric import KnowledgeFabric, create_default_knowledge_fabric
+    from derma_agent.derma_core.knowledge_fabric import KnowledgeFabric, create_default_knowledge_fabric
     from tools.enhanced_data_client import get_data_client, EXPANDED_CANCER_PROJECTS
     from tools.enhanced_clinical_stats import EnhancedStatsEngine, quick_survival_summary
     from tools.enhanced_pathology import (
         create_synthetic_pathology_image, NucleiSegmenter, 
         TissueAnalyzer, EnhancedWSIProcessor
     )
-    from derma_agent.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
+    from derma_agent.derma_core.derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
     ENHANCED_MODE = True
 except ImportError as e:
     st.error(f"Failed to load enhanced modules: {e}")
@@ -284,7 +284,7 @@ def render_discovery_tab():
                         # Map back to names for run_fast_discovery
                         cohort_names_mapped = [name.replace(" Cancer", "").replace(" Carcinoma", "") for name in selected_cohorts]
                         
-                        from agents.discovery_engine import run_fast_discovery
+                        from derma_agent.derma_core.agents.discovery_engine import run_fast_discovery
                         report = run_fast_discovery(
                             cancer_types=cohort_names_mapped,
                             config=config,
