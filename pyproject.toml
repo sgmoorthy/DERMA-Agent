@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "dermamind"
+version = "2.1.0"
+description = "Autonomous AI for Cancer Pathology Discovery"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+keywords = ["cancer", "pathology", "ai", "survival-analysis", "oncology"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["derma_agent*", "tools*"]
+
+[tool.setuptools.package-dir]
+"" = "."
