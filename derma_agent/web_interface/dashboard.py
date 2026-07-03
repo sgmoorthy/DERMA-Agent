@@ -1,5 +1,6 @@
 import io
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -7,6 +8,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import networkx as nx
+from pyvis.network import Network
 from scipy.stats import mannwhitneyu
 from lifelines import KaplanMeierFitter
 from lifelines.statistics import logrank_test
@@ -95,44 +97,95 @@ def plot_tissue_radar(titan_features: dict) -> io.BytesIO:
     return _buf(fig)
 
 
-def plot_kg_graph(fabric: KnowledgeFabric) -> io.BytesIO:
-    """NetworkX spring layout for the live knowledge graph."""
+def render_pyvis_kg(fabric: KnowledgeFabric, height: int = 420) -> str:
+    """
+    Build a fully interactive PyVis / vis.js knowledge graph.
+    Returns raw HTML string for use with st.components.v1.html().
+    Supports: drag nodes, scroll-to-zoom, hover tooltips, physics spring layout.
+    """
     G = fabric.graph
-    fig, ax = plt.subplots(figsize=(7, 4.5))
-    fig.patch.set_facecolor("#0f1117"); ax.set_facecolor("#0f1117")
 
-    pos = nx.spring_layout(G, seed=7, k=1.8)
+    # Node colour palette by entity type
+    def _node_color(n: str) -> str:
+        if n.startswith("TCGA"):                                    return "#e63946"
+        if n in ("BRAF", "TP53", "EGFR", "PTEN", "CDH1", "PIK3CA"): return "#4cc9f0"
+        if "Pathway" in n:                                          return "#f4a261"
+        if n in ("Dabrafenib", "Vemurafenib", "Pembrolizumab",
+                 "Trastuzumab", "Olaparib"):                        return "#2a9d8f"
+        return "#9b5de5"
 
-    # Colour nodes by type heuristic
-    color_map = []
-    for n in G.nodes():
-        if n.startswith("TCGA"):       color_map.append("#e63946")
-        elif n in ("BRAF", "TP53", "EGFR", "PTEN"): color_map.append("#4cc9f0")
-        elif "Pathway" in n:           color_map.append("#f4a261")
-        elif n in ("Dabrafenib", "Vemurafenib", "Pembrolizumab"): color_map.append("#2a9d8f")
-        else:                          color_map.append("#9b5de5")
+    def _node_shape(n: str) -> str:
+        if n.startswith("TCGA"):                                    return "diamond"
+        if n in ("BRAF", "TP53", "EGFR", "PTEN", "CDH1", "PIK3CA"): return "dot"
+        if "Pathway" in n:                                          return "hexagon"
+        if n in ("Dabrafenib", "Vemurafenib", "Pembrolizumab",
+                 "Trastuzumab", "Olaparib"):                        return "square"
+        return "ellipse"
 
-    nx.draw_networkx_nodes(G, pos, ax=ax, node_color=color_map, node_size=600, alpha=0.95)
-    nx.draw_networkx_labels(G, pos, ax=ax, font_size=7, font_color="#ffffff", font_weight="bold")
-    nx.draw_networkx_edges(G, pos, ax=ax, edge_color="#444466", width=1.5, alpha=0.7, arrows=True,
-                           arrowstyle="-|>", arrowsize=12)
+    net = Network(
+        height=f"{height}px",
+        width="100%",
+        bgcolor="#0f1117",
+        font_color="#eeeeee",
+        directed=True,
+    )
 
-    edge_labels = {(u, v): d.get("relation", "")[:12] for u, v, d in G.edges(data=True)}
-    nx.draw_networkx_edge_labels(G, pos, ax=ax, edge_labels=edge_labels,
-                                 font_size=6, font_color="#aaaaaa", bbox=dict(alpha=0))
+    # Physics: Barnes-Hut spring model
+    net.barnes_hut(
+        gravity=-8000,
+        central_gravity=0.3,
+        spring_length=140,
+        spring_strength=0.05,
+        damping=0.09,
+    )
 
-    legend_handles = [
-        mpatches.Patch(color="#4cc9f0", label="Gene"),
-        mpatches.Patch(color="#e63946", label="Disease/Cohort"),
-        mpatches.Patch(color="#f4a261", label="Pathway"),
-        mpatches.Patch(color="#2a9d8f", label="Drug"),
-        mpatches.Patch(color="#9b5de5", label="Other"),
-    ]
-    ax.legend(handles=legend_handles, loc="lower left", framealpha=0.3,
-              labelcolor="#f0f0f0", facecolor="#1a1a2e", fontsize=7)
-    ax.set_title("Live Knowledge Fabric Graph", color="#f0f0f0", fontsize=11, fontweight="bold")
-    ax.axis("off"); fig.tight_layout()
-    return _buf(fig)
+    for node in G.nodes():
+        color  = _node_color(node)
+        shape  = _node_shape(node)
+        degree = G.degree(node)
+        size   = max(18, min(40, 18 + degree * 4))
+        net.add_node(
+            node,
+            label=node,
+            title=f"<b>{node}</b><br>Connections: {degree}",
+            color={"background": color, "border": "#ffffff33",
+                   "highlight": {"background": "#ffffff", "border": color}},
+            shape=shape,
+            size=size,
+            font={"size": 11, "color": "#ffffff", "face": "Inter, sans-serif"},
+            borderWidth=1,
+            shadow=True,
+        )
+
+    for u, v, data in G.edges(data=True):
+        relation = data.get("relation", "ASSOCIATED_WITH")
+        net.add_edge(
+            u, v,
+            title=relation,
+            label=relation[:16] if len(relation) <= 24 else relation[:16] + "…",
+            color={"color": "#4e5276", "highlight": "#a5b4fc"},
+            arrows="to",
+            width=1.5,
+            smooth={"type": "curvedCW", "roundness": 0.15},
+            font={"size": 9, "color": "#aaaaaa", "align": "middle"},
+        )
+
+    # Disable the built-in configure UI for cleanliness
+    net.set_options("""
+    var options = {
+      "interaction": {
+        "hover": true,
+        "tooltipDelay": 100,
+        "navigationButtons": true,
+        "keyboard": { "enabled": true }
+      },
+      "edges": {
+        "smooth": { "type": "curvedCW", "roundness": 0.15 }
+      }
+    }
+    """)
+
+    return net.generate_html(notebook=False)
 
 
 def plot_apollo_embedding(embedding: np.ndarray, slide_id: str) -> io.BytesIO:
@@ -410,12 +463,16 @@ def render_dashboard():
 
     # ── RIGHT SIDEBAR: Model Internals (Secondary) & Filtered logs ──────────
     with col_side:
-        # 1. Collapsible Knowledge Fabric graph
+        # 1. Collapsible Knowledge Fabric graph (interactive PyVis)
         st.markdown("### 🛠️ Model Internals")
-        with st.expander("💡 Live Knowledge Fabric Graph", expanded=False):
-            st.caption("This graph represents the prior reasoning space used by the agent to construct hypotheses.")
-            st.image(plot_kg_graph(fabric), use_container_width=True)
-            
+        with st.expander("💡 Live Knowledge Fabric — Interactive Graph", expanded=True):
+            st.caption(
+                "**Drag** nodes to rearrange · **Scroll** to zoom · **Hover** for details · "
+                "**Click** to highlight connections. This graph powers hypothesis generation."
+            )
+            kg_html = render_pyvis_kg(fabric, height=440)
+            components.html(kg_html, height=460, scrolling=False)
+
             edges_list = [{"Source": u, "Target": v, "Relation": d.get("relation", "")}
                           for u, v, d in fabric.graph.edges(data=True)]
             if edges_list:
