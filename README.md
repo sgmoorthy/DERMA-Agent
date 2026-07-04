@@ -13,77 +13,120 @@
 
 ## What is DermaMind.ai?
 
-DermaMind.ai is an autonomous, agentic AI research platform for cancer pathology. It integrates:
-- A **Live Knowledge Graph** seeded with genes, drugs, and pathways
-- An **LLM-driven Discovery Engine** that dynamically generates and tests hypotheses
-- A **CodeAct Security Sandbox** that safely executes auto-generated Python statistics
-- A **WSI Perception Engine** (TITAN + APOLLO) for slide-level morphology features
-- An **Interactive Streamlit Dashboard** with survival plots, KM curves, and an AI research assistant
+DermaMind.ai is an agentic oncology research framework that combines:
+- a **WSI perception layer** for slide-level morphology features
+- a **knowledge fabric** for biomedical grounding
+- a **CodeAct-style execution loop** for dynamic statistical validation
+- **survival analysis** and ML summaries for hypothesis testing
+- **interactive dashboards** for exploration, provenance, and review
 
-Built for research scientists and clinician-scientists working with cohorts such as TCGA-BRCA and TCGA-SKCM.
-
----
-
-## 📋 Version Information
-
-| Component | Version | Status |
-|-----------|---------|--------|
-| **DermaMind.ai Core** | 2.1.0 | ✅ Stable |
-| **Python** | 3.11, 3.12 | ✅ Supported |
-| **Knowledge Fabric** | 1.0.0 | ✅ Active |
-| **Discovery Engine** | 2.1.0 | ✅ Active |
-| **Pathology AI (WSI)** | 1.5.0 | ✅ Active |
-| **Research Assistant** | 1.0.0 | ✅ Active |
-| **License** | MIT | ✅ Open Source |
+The project is designed for research scientists and clinician-scientists working with cohorts such as `TCGA-SKCM` and `TCGA-BRCA`, while remaining extensible to broader TCGA/GDC exploration.
 
 ---
 
-## 🎉 What's New in v2.1.0
+## What changed recently?
 
-### ✨ New in this release
-- 🤖 **FastDiscoveryEngine → Dashboard** — LLM-generated hypotheses & CodeAct scripts now run live in the UI
-- 💬 **AI Research Assistant Chat** — In-app AI assistant for discussing findings and explanations
-- 🕸️ **Interactive PyVis Knowledge Graph** — Drag, zoom, hover, and click-explore the knowledge fabric
-- 🧹 **Clean Architecture** — All agents consolidated under `derma_agent/derma_core/agents/`
-- 🛠️ **CI Pipeline Fixed** — GitHub Actions workflows updated to reflect the correct module paths
+The current workspace includes a research-grade documentation and math-alignment pass.
 
-### Previous Highlights (v2.0)
-- 🧠 **Knowledge Fabric** — Medical knowledge graph with 50+ nodes
-- 🚀 **Parallel Discovery Engine** — 10x speed improvement via ThreadPoolExecutor
-- 🔬 **Advanced Pathology** — Multi-method segmentation + texture analysis
-- 📊 **Research Dashboard** — Survival curves, KM plots, and tissue correlations
+### Research-grade upgrades
+- **Session-wide Benjamini–Hochberg FDR correction** in `derma_agent/derma_core/agents/discovery_engine.py`
+- **Attention-style pooled slide representations** in `derma_agent/derma_core/perception/wsi_engine.py`
+- **Dashboard support for raw p-values and adjusted q-values**
+- **New tests** for FDR correction and WSI pooling in `tests/test_research_math_alignment.py`
+- **Expanded documentation** including a walkthrough and multiple architecture/framework blog posts
+
+### Why this matters
+These changes make DermaMind.ai more faithful to the mathematical framing described in `data/DERMA_agent.pdf`, especially for:
+- exploratory multiple-testing control
+- slide-level representation from tile-level embeddings
+- transparent reporting of statistical significance
 
 ---
 
-## Architecture
+## Core architecture
 
-```
+```text
 DermaMind.ai
 ├── derma_agent/
-│   ├── app.py                          # Streamlit entrypoint
+│   ├── app.py                                # Primary Streamlit entrypoint
 │   ├── derma_core/
 │   │   ├── agents/
-│   │   │   ├── discovery_engine.py     # LLM hypothesis + CodeAct generation
-│   │   │   ├── orchestrator.py         # LangGraph workflow orchestrator
-│   │   │   └── research_assistant.py  # In-app AI chat assistant
+│   │   │   ├── discovery_engine.py          # Hypothesis generation + FDR-aware discovery
+│   │   │   ├── orchestrator.py              # Workflow orchestration
+│   │   │   └── research_assistant.py        # In-app AI assistant
 │   │   ├── actions/
-│   │   │   ├── code_executor.py        # Restricted CodeAct sandbox
-│   │   │   ├── critic_agent.py         # AST security audit
-│   │   │   └── safety_policy.py        # Malicious probe detection
+│   │   │   ├── code_executor.py             # Restricted sandbox executor
+│   │   │   ├── critic_agent.py              # AST/code safety critic
+│   │   │   └── safety_policy.py             # Execution constraints
 │   │   ├── knowledge_fabric/
-│   │   │   └── graph_memory.py         # Live knowledge graph
+│   │   │   └── graph_memory.py              # Lightweight graph memory for dashboard loop
 │   │   ├── memory/
-│   │   │   └── research_log.py         # Episodic research narrative
+│   │   │   └── research_log.py              # Episodic research narrative
 │   │   └── perception/
-│   │       └── wsi_engine.py           # WSI slide ingestion (TITAN/APOLLO)
-│   ├── web_interface/
-│   │   ├── dashboard.py                # Main dashboard render logic
-│   │   └── components.py              # Reusable UI components
-│   └── requirements.txt
-├── tools/                              # Legacy: data & clinical stats engines
+│   │       └── wsi_engine.py                # WSI ingestion + attention-style pooling
+│   └── web_interface/
+│       ├── dashboard.py                     # Main scientific UI
+│       └── components.py                    # Shared Streamlit UI helpers
+├── tools/
+│   ├── enhanced_clinical_stats.py           # DSL, KM, Cox, ML survival analysis
+│   ├── enhanced_data_client.py              # GDC/local-mirror data handling
+│   ├── enhanced_pathology.py                # Pathology feature extraction utilities
+│   └── knowledge_fabric.py                  # Research-grade oncology knowledge graph
+├── blog/                                    # Markdown source posts
+├── public/blog/                             # Previewable static blog pages
 ├── tests/
-└── docs/                              # GitHub Pages site (dermamind.ai)
+├── walkthrough.md                           # Walkthrough of recent changes
+└── README.md
 ```
+
+---
+
+## Research loop
+
+DermaMind.ai works as a closed-loop system rather than a single prediction model:
+
+1. **Perception** — slide metadata, tile/embedding summaries, pathology features
+2. **Knowledge grounding** — graph-based prior context from genes, pathways, drugs, diseases
+3. **Execution** — dynamic or DSL-routed statistical analysis in a constrained environment
+4. **Validation** — survival outputs, significance assessment, logging, and UI presentation
+
+### Mathematical alignment highlights
+- **Kaplan–Meier / log-rank** for group-wise survival comparisons
+- **Cox proportional hazards** modeling via `lifelines.CoxPHFitter`
+- **BH/FDR correction** applied across the discovery session
+- **Attention-style slide pooling** for a slide-level embedding from tile-level mock features
+
+---
+
+## Live links
+
+### Static site (GitHub Pages)
+These links are deterministic once GitHub Pages is enabled for the repository:
+- **Homepage:** `https://sgmoorthy.github.io/DERMA-Agent/`
+- **Docs hub:** `https://sgmoorthy.github.io/DERMA-Agent/docs/index.html`
+- **Blog index:** `https://sgmoorthy.github.io/DERMA-Agent/blog/index.html`
+- **Walkthrough mirror:** `https://sgmoorthy.github.io/DERMA-Agent/walkthrough.md`
+
+### Interactive Streamlit app
+There is currently **no verified public Streamlit runtime URL in this repository**.
+
+That is intentional in the docs: GitHub Actions can test Streamlit startup, but **GitHub Pages cannot host a Streamlit server**. To publish the interactive app, deploy one of the Streamlit entrypoints to Streamlit Community Cloud or another Python app host, then add that returned URL here.
+
+See: [`STREAMLIT_DEPLOYMENT.md`](STREAMLIT_DEPLOYMENT.md)
+
+### Secret configuration paths
+
+#### GitHub Actions secrets
+If you want CI to boot the Streamlit apps with real provider keys available:
+1. Open **GitHub → Settings → Secrets and variables → Actions**
+2. Add repository secrets:
+   - `OPENAI_API_KEY`
+   - `GOOGLE_API_KEY`
+
+#### Streamlit secrets
+For Streamlit Community Cloud or local Streamlit secrets-based configuration:
+- use `.streamlit/secrets.toml.example` as the template
+- add the same keys in **App settings → Secrets** on Streamlit Community Cloud
 
 ---
 
@@ -98,65 +141,117 @@ cd DERMA-Agent
 python -m venv .venv
 source .venv/bin/activate       # Windows: .venv\Scripts\activate
 
-# Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
 
-# Set your API key (enables live LLM hypothesis generation)
+# Install front-end dependencies
+npm install
+
+# Optional: enable live LLM-backed hypothesis generation
 export OPENAI_API_KEY="your_api_key_here"
 # Windows: set OPENAI_API_KEY=your_api_key_here
 ```
 
-> **No API key?** DermaMind.ai gracefully falls back to a built-in mock generator so you can explore the full UI without any API costs.
+> **No API key?** The project falls back to mock behavior for key discovery flows so you can still explore the UI and architecture locally.
 
 ---
 
-## Launching the Dashboard
+## Running the project
 
+### 1. Primary Streamlit dashboard
 ```bash
-# Run the DermaMind.ai Streamlit dashboard
-streamlit run derma_agent/app.py --server.port 8507
+.venv\Scripts\python.exe -m streamlit run derma_agent/app.py --server.port 8507
+```
+Open: `http://localhost:8507`
+
+### 2. Enhanced dashboard
+```bash
+.venv\Scripts\python.exe -m streamlit run app_enhanced.py --server.port 8508
+```
+Open: `http://localhost:8508`
+
+### 3. Front-end landing page
+```bash
+npm run dev
 ```
 
-Then open **http://localhost:8507** in your browser.
+### 4. Front-end production preview
+```bash
+npm run build
+npm run preview -- --host 127.0.0.1 --port 4173
+```
+Open: `http://127.0.0.1:4173`
+
+### 5. Previewable blog pages
+When the Vite app is running, open:
+- `/blog/index.html`
+- `/blog/closed-loop-agentic-discovery.html`
+- `/blog/architecture-deep-dive.html`
+- `/blog/research-math-and-safety.html`
+- `/blog/scaling-derma-mind-to-multiple-cancers.html`
 
 ---
 
-## Using the Discovery Loop
-
-1. Select a **Target Cohort** (e.g. TCGA-SKCM) in the sidebar.
-2. Enter a **Slide ID** for WSI perception.
-3. Click **🚀 Run Generative Discovery Loop**.
-
-The agent will:
-- **Phase 1** — Ingest the slide and run TITAN + APOLLO feature extraction.
-- **Phase 2** — Consult the Knowledge Fabric and generate a hypothesis via LLM.
-- **Phase 3** — Auto-generate CodeAct Python, submit to AST security critic.
-- **Phase 4** — Execute in the restricted sandbox and extract survival statistics.
-- **Results** — Render Kaplan-Meier curves, cellularity scatter, APOLLO embedding, and save to the narrative log.
-
----
-
-## Programmatic API
+## Programmatic usage
 
 ```python
-from derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine, DiscoveryConfig
-from derma_agent.derma_core.knowledge_fabric.graph_memory import KnowledgeFabric
+from derma_agent.derma_core.agents.discovery_engine import (
+    DiscoveryConfig,
+    FastDiscoveryEngine,
+    run_fast_discovery,
+)
+from tools.knowledge_fabric import create_default_knowledge_fabric
 
-# Build a knowledge fabric
-kg = KnowledgeFabric()
+config = DiscoveryConfig(
+    parallel_workers=2,
+    hypothesis_per_cohort=3,
+    significance_threshold=0.05,
+    use_knowledge_fabric=True,
+)
 
-# Configure and run discovery
-config = DiscoveryConfig(parallel_workers=4, hypothesis_per_cohort=3, use_knowledge_fabric=True)
-engine = FastDiscoveryEngine(config, knowledge_fabric=kg)
-results = engine.discover_single_cohort("TCGA-BRCA", "Breast Cancer")
+kg = create_default_knowledge_fabric()
+engine = FastDiscoveryEngine(config=config, knowledge_fabric=kg)
 
-significant = engine.get_significant_findings()
-print(f"Found {len(significant)} significant discoveries!")
+report = run_fast_discovery(
+    cancer_types=["Skin Cancer", "Breast Cancer"],
+    config=config,
+    output_dir="discoveries",
+)
+
+print(report["significant_findings"])
+print(report["fdr_method"])
 ```
 
 ---
 
-## Supported Cancer Cohorts
+## Statistical and safety model
+
+### Survival and discovery statistics
+The project supports:
+- Kaplan–Meier estimation
+- log-rank testing
+- Cox proportional hazards regression
+- ML survival/discrimination summaries
+- structured DSL-driven analysis requests
+
+### Multiple-testing control
+The discovery engine now stores both:
+- raw `p_value`
+- adjusted `adjusted_p_value` (q-value)
+
+This is important because an agentic research loop may test many hypotheses during one session.
+
+### Safe dynamic execution
+DermaMind.ai uses multiple safeguards:
+- AST validation before execution
+- critic-based code review
+- restricted execution context
+- constrained imports and builtins
+- explicit execution history / trace capture
+
+---
+
+## Supported cancer cohorts
 
 | Cancer Type | TCGA Code | Cancer Type | TCGA Code |
 |-------------|-----------|-------------|-----------|
@@ -171,27 +266,74 @@ print(f"Found {len(significant)} significant discoveries!")
 
 ---
 
-## Knowledge Fabric Schema
+## Documentation map
 
-```
-Node Types:          Relationships:
-├── Gene             ├── MUTATED_IN (Gene → Cancer)
-├── Protein          ├── TREATS (Drug → Cancer)
-├── Drug             ├── TARGETS (Drug → Pathway/Gene)
-├── Disease          ├── PART_OF (Gene → Pathway)
-├── Pathway          ├── PREDICTS_RESPONSE_TO (Feature → Drug)
-└── Clinical_Feature └── ASSOCIATED_WITH (Gene → Clinical_Feature)
-```
+### Walkthrough
+- [`walkthrough.md`](walkthrough.md) — summary of recent research-grade changes, validations, and design rationale
+
+### Blog source posts
+- [`blog/scaling-derma-mind-to-multiple-cancers.md`](blog/scaling-derma-mind-to-multiple-cancers.md)
+- [`blog/closed-loop-agentic-discovery.md`](blog/closed-loop-agentic-discovery.md)
+- [`blog/architecture-deep-dive.md`](blog/architecture-deep-dive.md)
+- [`blog/research-math-and-safety.md`](blog/research-math-and-safety.md)
+
+### Previewable static pages
+- `public/docs/index.html`
+- `public/blog/index.html`
+- `public/blog/closed-loop-agentic-discovery.html`
+- `public/blog/architecture-deep-dive.html`
+- `public/blog/research-math-and-safety.html`
+- `public/blog/scaling-derma-mind-to-multiple-cancers.html`
+
+### Deployment guides
+- [`STREAMLIT_DEPLOYMENT.md`](STREAMLIT_DEPLOYMENT.md)
+- [`GITHUB_PAGES_SETUP.md`](GITHUB_PAGES_SETUP.md)
+- [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example)
 
 ---
 
-## Safety & Security
+## CI/CD and deployment model
 
-DermaMind.ai uses a multi-layer code execution sandbox:
-- All auto-generated Python is validated with **AST parsing** before execution.
-- The **CriticAgent** checks for unsafe imports (e.g. `os`, `subprocess`, `socket`).
-- Execution is restricted to approved statistical libraries only.
-- Malicious probes are blocked with a `BLOCKED — Security Violation` response.
+### Static site deployment
+The Vite-powered homepage, docs hub, walkthrough mirror, and blog pages are deployed via GitHub Pages.
+
+Workflow:
+- `.github/workflows/pages.yml`
+
+### Streamlit CI validation
+The interactive dashboards are validated in CI by booting them headlessly.
+
+Workflow:
+- `.github/workflows/streamlit-smoke.yml`
+
+### Important hosting distinction
+GitHub Actions can test Streamlit startup, but GitHub Pages cannot host a long-running Streamlit server.
+
+Use this split:
+- **GitHub Pages** → static docs/site/blog
+- **Streamlit Community Cloud or another app host** → `derma_agent/app.py` or `app_enhanced.py`
+
+---
+
+## Validation
+
+Commands used for recent verification:
+
+```bash
+# Python tests
+.venv\Scripts\python.exe -m unittest discover tests
+
+# Streamlit dashboards
+.venv\Scripts\python.exe -m streamlit run derma_agent/app.py --server.port 8507
+.venv\Scripts\python.exe -m streamlit run app_enhanced.py --server.port 8508
+
+# Front-end build / preview
+npm run build
+npm run preview -- --host 127.0.0.1 --port 4173
+```
+
+Most recent test result in this workspace:
+- **11 tests passed**
 
 ---
 
@@ -216,13 +358,13 @@ MIT License — See [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions are welcome! Areas of interest:
-- Additional TCGA/GDC cohort support
-- New ML models for survival prediction
-- Enhanced WSI segmentation methods
-- Knowledge graph expansion (new genes, drugs, pathways)
-- UI/UX improvements to the dashboard
+Contributions are welcome, especially in:
+- additional TCGA/GDC cohort support
+- stronger pathology foundation-model integration
+- richer discovery benchmarks
+- better export/reporting of q-values and provenance
+- architecture/docs improvements
 
 ---
 
-**DermaMind.ai** · Powered by LangGraph · OpenAI · TCGA/GDC · Lifelines · Streamlit
+**DermaMind.ai** · Powered by LangGraph · OpenAI · TCGA/GDC · Lifelines · Streamlit · Vite

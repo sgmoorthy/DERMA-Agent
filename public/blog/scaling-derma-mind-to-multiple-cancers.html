@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scaling DermaMind.ai to Multiple Cancers</title>
+    <link rel="stylesheet" href="/blog/styles.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <nav><a href="/blog/index.html">← Blog index</a></nav>
+      <section class="hero">
+        <div class="badge">Framework evolution</div>
+        <h1>Scaling DermaMind.ai from skin cancer to multi-oncology discovery</h1>
+        <p>
+          DermaMind.ai began as a skin-cancer-focused pathology agent. The framework is now organized
+          so the same perception, reasoning, and execution loop can be applied across multiple TCGA cohorts.
+        </p>
+      </section>
+
+      <p>
+        The key shift was architectural rather than cosmetic. The project moved from disease-specific assumptions
+        to explicit cohort configuration, reusable data access, and shared discovery orchestration.
+      </p>
+
+      <h2>What changed</h2>
+      <ul>
+        <li>clinical data loading became cohort-aware rather than melanoma-only,</li>
+        <li>the discovery engine gained project-specific context,</li>
+        <li>the UI gained cohort-aware controls and outputs,</li>
+        <li>results became easier to compare across disease settings.</li>
+      </ul>
+
+      <h2>Why this matters</h2>
+      <p>
+        A general-purpose oncology discovery system must be able to move between cohorts without rewriting the
+        entire workflow. That means the data layer, prompts, knowledge graph, and statistical engine all have to
+        be parameterized rather than hardcoded.
+      </p>
+
+      <h2>Where to read more</h2>
+      <p>
+        Continue with the <a href="/blog/architecture-deep-dive.html">architecture deep dive</a> or the
+        <a href="/blog/closed-loop-agentic-discovery.html">closed-loop discovery overview</a>.
+      </p>
+    </div>
+  </body>
+</html>

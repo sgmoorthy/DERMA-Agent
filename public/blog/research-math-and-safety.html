@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Research Math and Safety</title>
+    <link rel="stylesheet" href="/blog/styles.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <nav><a href="/blog/index.html">← Blog index</a></nav>
+      <section class="hero">
+        <div class="badge">Research math and safety</div>
+        <h1>Why statistical correction and sandboxing both matter</h1>
+        <p>
+          DermaMind.ai combines classical survival analysis with explicit execution controls so that generated findings
+          are both quantitatively interpretable and operationally auditable.
+        </p>
+      </section>
+
+      <h2>Survival-analysis backbone</h2>
+      <p>
+        Kaplan–Meier curves, log-rank tests, and Cox models provide clinically legible outputs for candidate findings.
+      </p>
+
+      <h2>Multiple-testing control</h2>
+      <p>
+        Agentic exploration can generate many hypotheses. The current engine therefore applies session-wide
+        Benjamini–Hochberg false-discovery-rate correction so that exploratory results are reported more honestly.
+      </p>
+
+      <h2>Attention-style slide pooling</h2>
+      <p>
+        The perception layer now exposes an attention-style pooled slide representation, mirroring the paper’s AMIL-style
+        abstraction even in mock mode.
+      </p>
+
+      <h2>Execution safety</h2>
+      <p>
+        AST validation, critic checks, restricted imports, and sandboxed execution make it easier to inspect how an
+        analysis was produced and reduce the risk of unsafe generated code.
+      </p>
+
+      <h2>Takeaway</h2>
+      <p>
+        Scientific usefulness depends on both math and mechanism. A result is more believable when the system can show
+        corrected significance metrics and a constrained execution path.
+      </p>
+    </div>
+  </body>
+</html>

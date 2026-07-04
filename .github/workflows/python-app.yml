@@ -2,9 +2,9 @@ name: Python Application
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -14,43 +14,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Cache pip packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-app-${{ hashFiles('requirements-ci.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-app-
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-app-${{ hashFiles('requirements-ci.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-app-
 
-    - name: Upgrade pip
-      run: python -m pip install --upgrade pip
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
 
-    - name: Install dependencies
-      run: |
-        pip install flake8
-        pip install -r requirements-ci.txt
+      - name: Install dependencies
+        run: |
+          pip install flake8
+          pip install -r requirements-ci.txt
 
-    - name: Install package (editable)
-      run: pip install -e . --no-deps
+      - name: Upgrade build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
 
-    - name: Lint with flake8
-      run: |
-        # Stop on syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,__pycache__
-        # Warnings only
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv,venv,__pycache__
+      - name: Install package (editable)
+        run: pip install -e . --no-deps
 
-    - name: Verify core imports
-      env:
-        PYTHONPATH: ${{ github.workspace }}
-      run: |
-        python -c "from derma_agent.derma_core.knowledge_fabric.graph_memory import KnowledgeFabric; print('KnowledgeFabric OK')"
-        python -c "from derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine; print('DiscoveryEngine OK')"
-        echo "All imports verified!"
+      - name: Lint with flake8
+        run: |
+          # Stop on syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,__pycache__
+          # Warnings only
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv,venv,__pycache__
+
+      - name: Verify core imports
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -c "from derma_agent.derma_core.knowledge_fabric.graph_memory import KnowledgeFabric; print('KnowledgeFabric OK')"
+          python -c "from derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine; print('DiscoveryEngine OK')"
+          echo "All imports verified!"

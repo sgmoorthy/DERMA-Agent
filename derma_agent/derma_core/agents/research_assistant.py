@@ -14,6 +14,8 @@ import os
 import textwrap
 from typing import Any
 
+from derma_agent.secrets import get_secret
+
 # ──────────────────────────────────────────────────────────────────────────────
 # System prompt template
 # ──────────────────────────────────────────────────────────────────────────────
@@ -137,13 +139,21 @@ def _rule_based_response(message: str) -> str:
     msg_lower = message.lower()
     if any(k in msg_lower for k in ["braf", "mutation", "mutant", "variant"]):
         return _FALLBACK_RESPONSES["braf"]
-    if any(k in msg_lower for k in ["p-value", "p value", "pvalue", "significant", "significance"]):
+    if any(
+        k in msg_lower
+        for k in ["p-value", "p value", "pvalue", "significant", "significance"]
+    ):
         return _FALLBACK_RESPONSES["p-value"]
     if any(k in msg_lower for k in ["cellularity", "morphol", "tissue", "histol"]):
         return _FALLBACK_RESPONSES["cellularity"]
-    if any(k in msg_lower for k in ["km", "kaplan", "meier", "survival curve", "curve"]):
+    if any(
+        k in msg_lower for k in ["km", "kaplan", "meier", "survival curve", "curve"]
+    ):
         return _FALLBACK_RESPONSES["km"]
-    if any(k in msg_lower for k in ["next", "recommend", "suggest", "follow", "step", "todo"]):
+    if any(
+        k in msg_lower
+        for k in ["next", "recommend", "suggest", "follow", "step", "todo"]
+    ):
         return _FALLBACK_RESPONSES["next"]
     return _FALLBACK_RESPONSES["default"]
 
@@ -151,6 +161,7 @@ def _rule_based_response(message: str) -> str:
 # ──────────────────────────────────────────────────────────────────────────────
 # ResearchAssistant class
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 class ResearchAssistant:
     """
@@ -170,7 +181,7 @@ class ResearchAssistant:
         api_key: str | None = None,
         model_name: str = "gemini-1.5-flash",
     ):
-        self._api_key = api_key or os.environ.get("GOOGLE_API_KEY", "")
+        self._api_key = api_key or get_secret("GOOGLE_API_KEY", "") or ""
         self._model_name = model_name
         self._client = None
         self._chat = None
@@ -180,6 +191,7 @@ class ResearchAssistant:
         if self._api_key:
             try:
                 import google.generativeai as genai  # type: ignore
+
                 genai.configure(api_key=self._api_key)
                 self._genai = genai
                 self._llm_available = True
@@ -188,7 +200,9 @@ class ResearchAssistant:
 
     # ── Context injection ────────────────────────────────────────────────────
 
-    def update_context(self, runs: list[dict[str, Any]], cohort: str, fabric_summary: str) -> None:
+    def update_context(
+        self, runs: list[dict[str, Any]], cohort: str, fabric_summary: str
+    ) -> None:
         """Inject current session state into the assistant's system prompt."""
         if not runs:
             self._session_context = (

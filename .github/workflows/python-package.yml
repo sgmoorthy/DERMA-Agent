@@ -2,9 +2,9 @@ name: Python Package
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -15,47 +15,51 @@ jobs:
         python-version: ["3.11", "3.12"]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Cache pip packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-ci-${{ hashFiles('requirements-ci.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-ci-
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-ci-${{ hashFiles('requirements-ci.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-ci-
 
-    - name: Upgrade pip
-      run: python -m pip install --upgrade pip
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
 
-    - name: Install CI dependencies
-      run: pip install -r requirements-ci.txt
+      - name: Install CI dependencies
+        run: pip install -r requirements-ci.txt
 
-    - name: Install package (editable)
-      run: pip install -e . --no-deps
+      - name: Upgrade build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
 
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        # Stop on syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,__pycache__
-        # Warnings only (exit-zero)
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv,venv,__pycache__
+      - name: Install package (editable)
+        run: pip install -e . --no-deps
 
-    - name: Run tests
-      run: |
-        pip install pytest
-        pytest --tb=short -v --ignore=.venv || true
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          # Stop on syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,__pycache__
+          # Warnings only (exit-zero)
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv,venv,__pycache__
 
-    - name: Verify core imports
-      env:
-        PYTHONPATH: ${{ github.workspace }}
-      run: |
-        python -c "from derma_agent.derma_core.knowledge_fabric.graph_memory import KnowledgeFabric; print('KnowledgeFabric OK')"
-        python -c "from derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine; print('DiscoveryEngine OK')"
-        echo "Core imports verified successfully!"
+      - name: Run tests
+        run: |
+          pip install pytest
+          pytest --tb=short -v --ignore=.venv || true
+
+      - name: Verify core imports
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -c "from derma_agent.derma_core.knowledge_fabric.graph_memory import KnowledgeFabric; print('KnowledgeFabric OK')"
+          python -c "from derma_agent.derma_core.agents.discovery_engine import FastDiscoveryEngine; print('DiscoveryEngine OK')"
+          echo "Core imports verified successfully!"

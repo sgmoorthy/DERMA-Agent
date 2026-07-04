@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Architecture Deep Dive</title>
+    <link rel="stylesheet" href="/blog/styles.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <nav><a href="/blog/index.html">← Blog index</a></nav>
+      <section class="hero">
+        <div class="badge">Architecture deep dive</div>
+        <h1>How DermaMind.ai fits together</h1>
+        <p>
+          The project is easiest to understand as five cooperating layers: perception, graph grounding, safe
+          execution, statistical validation, and presentation.
+        </p>
+      </section>
+
+      <h2>Perception</h2>
+      <p>
+        The perception layer abstracts away slide details and produces stable slide-level outputs for downstream use.
+      </p>
+
+      <h2>Knowledge grounding</h2>
+      <p>
+        The knowledge fabric prevents free-form biological drift by anchoring candidate hypotheses in known entities
+        and relations.
+      </p>
+
+      <h2>Safe execution</h2>
+      <p>
+        Because the system can generate code dynamically, AST checks, critic logic, and restricted execution are part
+        of the architecture rather than optional extras.
+      </p>
+
+      <h2>Statistical validation</h2>
+      <p>
+        Survival methods translate a candidate biological claim into a measurable result. In the current codebase,
+        those results are now tracked with both raw p-values and FDR-adjusted q-values.
+      </p>
+
+      <h2>Presentation</h2>
+      <p>
+        Streamlit dashboards and the Vite landing page expose the workflow for both researchers and external readers.
+      </p>
+
+      <h2>Read next</h2>
+      <p>
+        Continue to <a href="/blog/research-math-and-safety.html">Research math and safety</a> for the statistical
+        and security rationale behind the framework.
+      </p>
+    </div>
+  </body>
+</html>

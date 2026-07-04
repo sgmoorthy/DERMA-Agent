@@ -1,251 +1,85 @@
-# GitHub Pages Setup Instructions
+# GitHub Pages and Streamlit CI/CD Setup
 
-## 🌐 Your GitHub Pages Site is Ready!
+## What GitHub Actions now does
 
-**Repository:** https://github.com/sgmoorthy/DERMA-Agent  
-**Commit:** `3e8ac51`  
-**Status:** ✅ Code pushed and ready for deployment
+This repository now uses two separate deployment/validation tracks:
 
----
+### 1. GitHub Pages for the static site
+Workflow:
+- `.github/workflows/pages.yml`
 
-## 🚀 Enable GitHub Pages (One-Time Setup)
+What it does:
+- installs Node dependencies
+- builds the Vite site
+- publishes the generated `docs/` output to GitHub Pages
 
-To activate your website, you need to enable GitHub Pages in your repository settings:
+This serves:
+- homepage
+- docs hub
+- blog pages
+- walkthrough mirror
 
-### Step 1: Go to Repository Settings
-1. Visit: https://github.com/sgmoorthy/DERMA-Agent
-2. Click on **"Settings"** tab (top right)
+Expected live URLs after Pages is enabled:
+- `https://sgmoorthy.github.io/DERMA-Agent/`
+- `https://sgmoorthy.github.io/DERMA-Agent/docs/index.html`
+- `https://sgmoorthy.github.io/DERMA-Agent/blog/index.html`
+- `https://sgmoorthy.github.io/DERMA-Agent/walkthrough.md`
 
-### Step 2: Configure Pages
-1. In the left sidebar, click **"Pages"** under "Code and automation"
-2. Under "Build and deployment" > "Source", select:
-   - **"GitHub Actions"** (recommended - already configured)
-   
-   OR
-   
-   - **"Deploy from a branch"**
-     - Branch: `main`
-     - Folder: `/docs`
+### 2. Streamlit startup validation in CI
+Workflow:
+- `.github/workflows/streamlit-smoke.yml`
 
-### Step 3: Wait for Deployment
-- The site will be built and deployed automatically
-- This usually takes 1-2 minutes
-- Refresh the page to see the deployment status
+What it does:
+- installs Python dependencies
+- boots `derma_agent/app.py` in headless mode
+- boots `app_enhanced.py` in headless mode
+- fails CI if either app cannot start cleanly
 
-### Step 4: Access Your Site
-Once deployed, your site will be live at:
-
-**🔗 https://sgmoorthy.github.io/DERMA-Agent**
-
----
-
-## 📁 What Was Created
-
-### Website Files
-```
-docs/
-├── index.html              # Main documentation page (2,000+ lines)
-├── assets/
-│   ├── css/
-│   │   └── style.css       # Professional styling (1,000+ lines)
-│   ├── js/
-│   │   └── main.js         # Interactive elements
-│   └── images/             # (Ready for screenshots)
-└── tutorials/              # (Ready for additional tutorials)
-```
-
-### CI/CD Workflow
-```
-.github/workflows/pages.yml  # Automatic deployment on every push
-```
+This is the correct GitHub Actions role for Streamlit in this repository.
 
 ---
 
-## 🎨 Website Features
+## Important limitation
 
-### 1. **Hero Section**
-- Animated discovery visualization
-- Key statistics (20+ cancer types, 50+ knowledge nodes, 10x faster)
-- Quick access buttons
+GitHub Pages cannot host Streamlit.
 
-### 2. **Overview Section**
-- 4 feature cards explaining the system
-- Knowledge Fabric, TCGA Integration, Discovery Engine, Pathology AI
+Why:
+- GitHub Pages serves static files only
+- Streamlit requires a live Python process and runtime
 
-### 3. **For Scientists Section**
-- **4 Research Applications** with detailed explanations:
-  - Narrow Down Research Focus
-  - Early Cancer Identification
-  - Survival Analysis
-  - Knowledge Discovery
-- **Research Workflow Diagram** - 6-step visual guide
-- Real-world examples for each use case
-
-### 4. **Step-by-Step Tutorial** (6 Interactive Tabs)
-- **Installation** - Complete setup guide
-- **Quick Start** - 4 ways to get started
-- **Knowledge Graph** - Query and customize medical knowledge
-- **Discovery** - Configure and run discovery engine
-- **Pathology** - Image analysis and segmentation
-- **Dashboard** - Web interface guide
-
-### 5. **Expected Results Section**
-- **Knowledge Graph Output** - Sample statistics and queries
-- **Discovery Engine Output** - P-values, hazard ratios, execution times
-- **Kaplan-Meier Survival Chart** - Interactive Chart.js visualization
-- **ML Model Output** - C-index, feature importance, risk stratification
-- **Pathology Analysis** - Nuclei count, texture features, cellularity
-- **Dashboard Preview** - Mock interface demonstration
-- **Timeline** - Expected time to results (5 min to 4 hours)
+So the right deployment split is:
+- **GitHub Pages** → static site/docs/blog
+- **Streamlit Community Cloud or another app host** → interactive dashboards
 
 ---
 
-## 📊 Expected Results Examples
+## How to enable GitHub Pages
 
-### Discovery Output
-```
-Hypothesis 1: ✅ SIGNIFICANT
-Statement: High CD8+ T-cell infiltration correlates with better survival
-P-value: 0.023 (significant at α=0.05)
-Hazard Ratio: 0.67 (95% CI: 0.48-0.93)
-Test: Cox Proportional Hazards
-Execution Time: 2.4s
-```
-
-### ML Model Output
-```
-Random Forest Survival Model:
-  C-index (Concordance): 0.74
-  Cross-validation Score: 0.72 ± 0.03
-  
-Feature Importance:
-  1. Tumor Stage: 0.28 ████████████
-  2. Age: 0.21 █████████
-  3. Mutation Count: 0.18 ████████
-  4. Lymphocyte Density: 0.15 ██████
-```
-
-### Pathology Output
-```
-Histopathology Analysis:
-  Nuclei Count: 1,247
-  Nuclei Density: 0.0048 nuclei/pixel²
-  Cellularity: 0.34 (34% of tissue)
-  
-Texture Features (GLCM):
-  Contrast: 0.23 (low variation)
-  Homogeneity: 0.67 (high uniformity)
-```
+1. Go to repository settings
+2. Open **Pages**
+3. Set **Source** to **GitHub Actions**
+4. Push to `main`
+5. Wait for the `Deploy to GitHub Pages` workflow to finish
 
 ---
 
-## 🔄 Automatic Updates
+## Recommended Streamlit deployment target
 
-The site automatically updates when you:
-1. Push changes to the `main` branch
-2. Modify files in the `docs/` directory
-3. Trigger the workflow manually from GitHub Actions tab
+For the interactive dashboards, deploy one of these entrypoints to Streamlit Community Cloud:
+- `derma_agent/app.py`
+- `app_enhanced.py`
 
----
+Secrets should be added in the relevant platform settings:
+- **GitHub Actions**: `Settings → Secrets and variables → Actions`
+- **Streamlit Community Cloud**: `App settings → Secrets`
 
-## 📱 Mobile Responsive
+Suggested secret names:
+- `OPENAI_API_KEY`
+- `GOOGLE_API_KEY`
 
-The website is fully responsive and works on:
-- Desktop (1200px+)
-- Tablet (768px - 1024px)
-- Mobile (< 768px)
+Once deployed, add the returned Streamlit URL to the README live links section.
 
----
-
-## 🎓 How Scientists Can Use This Site
-
-### For Research
-1. **Understand capabilities** - Read the "For Scientists" section
-2. **Learn workflow** - Follow the 6-step research workflow diagram
-3. **Get started** - Follow step-by-step installation tutorial
-4. **See expected results** - Review sample outputs before running
-5. **Estimate timeline** - Check expected time to results section
-
-### For Teaching
-- Share the URL with students/collaborators
-- Use visualizations to explain AI in cancer research
-- Reference sample outputs in publications
-
-### For Collaboration
-- Link to specific sections when discussing features
-- Use expected outputs to set research expectations
-- Reference timeline for project planning
-
----
-
-## 🔧 Customization
-
-To modify the website:
-
-### Edit Content
-```bash
-# Edit main page
-nano docs/index.html
-
-# Edit styles
-docs/assets/css/style.css
-
-# Edit JavaScript
-docs/assets/js/main.js
-```
-
-### Add Screenshots
-1. Save screenshots to `docs/assets/images/`
-2. Reference in HTML: `<img src="assets/images/screenshot.png">`
-
-### Add New Sections
-1. Edit `docs/index.html`
-2. Add new `<section id="new-section">`
-3. Update navigation menu
-4. Commit and push
-
----
-
-## 📈 Analytics
-
-The site includes basic analytics tracking:
-- Page load events
-- GitHub button clicks
-- Tutorial tab interactions
-
-View in browser console or integrate with Google Analytics by adding your tracking ID to `main.js`.
-
----
-
-## 🆘 Troubleshooting
-
-### Site Not Loading
-1. Check that Pages is enabled in Settings > Pages
-2. Verify the source is set to `main` branch and `/docs` folder
-3. Check Actions tab for build errors
-
-### Changes Not Appearing
-1. Clear browser cache (Ctrl+Shift+R)
-2. Check that files were committed and pushed
-3. Wait 1-2 minutes for deployment
-
-### 404 Error
-1. Ensure `index.html` exists in `docs/` folder
-2. Check repository is public (required for GitHub Pages)
-3. Try accessing with `/index.html` suffix
-
----
-
-## 🎉 Success!
-
-Your GitHub Pages site is configured and ready to help researchers understand and use DERMA-Agent!
-
-**Next Steps:**
-1. ⭐ Star the repository
-2. 📢 Share the site URL with your network
-3. 📝 Add screenshots to `docs/assets/images/`
-4. 🎨 Customize colors/branding as needed
-
----
-
-**Questions?** Open an issue at https://github.com/sgmoorthy/DERMA-Agent/issues
+See also:
+- `STREAMLIT_DEPLOYMENT.md`
+- `.streamlit/secrets.toml.example`
+- `README.md`

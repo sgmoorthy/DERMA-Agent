@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Closed-Loop Agentic Discovery in DermaMind.ai</title>
+    <link rel="stylesheet" href="/blog/styles.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <nav><a href="/blog/index.html">← Blog index</a></nav>
+      <section class="hero">
+        <div class="badge">Closed-loop discovery</div>
+        <h1>Why DermaMind.ai is a research loop, not just a model</h1>
+        <p>
+          The framework is organized as a cycle of perception, knowledge grounding, execution, and validation.
+          That closed loop is what makes the system useful for hypothesis generation rather than only prediction.
+        </p>
+      </section>
+
+      <h2>The loop</h2>
+      <ol>
+        <li><strong>Perception</strong> turns WSI context into slide-level representations.</li>
+        <li><strong>Knowledge grounding</strong> constrains search with a biomedical graph.</li>
+        <li><strong>Execution</strong> routes analysis through a sandboxed code path.</li>
+        <li><strong>Validation</strong> returns survival statistics and interpretable findings.</li>
+      </ol>
+
+      <h2>Why this is different</h2>
+      <p>
+        In many AI demos the workflow stops after classification. DermaMind.ai instead pushes the output into a
+        testable research question and preserves enough metadata to inspect how the claim was produced.
+      </p>
+
+      <h2>Why the latest upgrade matters</h2>
+      <p>
+        The current implementation now treats discovery as an exploratory process by applying session-wide
+        Benjamini–Hochberg FDR correction rather than relying only on raw p-values.
+      </p>
+
+      <h2>Read next</h2>
+      <p>
+        For the component-level view, see <a href="/blog/architecture-deep-dive.html">Architecture deep dive</a>.
+      </p>
+    </div>
+  </body>
+</html>
